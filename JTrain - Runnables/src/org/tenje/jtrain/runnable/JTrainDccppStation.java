@@ -13,11 +13,11 @@
  * along with this program. If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  *******************************************************************************/
-package de.tenje.jtrain.runnable;
+package org.tenje.jtrain.runnable;
 
 import java.io.IOException;
 
-import de.tenje.jtrain.dccpp.server.DccppStation;
+import org.tenje.jtrain.dccpp.server.DccppStation;
 
 /**
  * A stand-alone program to create a {@link DccppStation}.

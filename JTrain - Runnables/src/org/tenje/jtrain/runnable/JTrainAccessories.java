@@ -13,7 +13,7 @@
  * along with this program. If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  *******************************************************************************/
-package de.tenje.jtrain.runnable;
+package org.tenje.jtrain.runnable;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -36,6 +36,14 @@ import org.tenje.jtrain.Signal;
 import org.tenje.jtrain.SignalAspect;
 import org.tenje.jtrain.SignalAspectControlTurnout;
 import org.tenje.jtrain.Turnout;
+import org.tenje.jtrain.dccpp.impl.PacketFactoryImpl;
+import org.tenje.jtrain.dccpp.impl.PacketSensorRegistry;
+import org.tenje.jtrain.dccpp.impl.PacketTurnoutRegistry;
+import org.tenje.jtrain.dccpp.impl.SensorListeningPacketSender;
+import org.tenje.jtrain.dccpp.server.DccppSocket;
+import org.tenje.jtrain.rpi.RPiSensor;
+import org.tenje.jtrain.rpi.RPiSignal;
+import org.tenje.jtrain.rpi.RPiTurnout;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
@@ -43,15 +51,6 @@ import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
-
-import de.tenje.jtrain.dccpp.impl.PacketFactoryImpl;
-import de.tenje.jtrain.dccpp.impl.PacketSensorRegistry;
-import de.tenje.jtrain.dccpp.impl.PacketTurnoutRegistry;
-import de.tenje.jtrain.dccpp.impl.SensorListeningPacketSender;
-import de.tenje.jtrain.dccpp.server.DccppSocket;
-import de.tenje.jtrain.rpi.RPiSensor;
-import de.tenje.jtrain.rpi.RPiSignal;
-import de.tenje.jtrain.rpi.RPiTurnout;
 
 /**
  * A stand-alone program to control some accessories.
