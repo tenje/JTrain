@@ -12,4 +12,6 @@ Current projects
 
 [RPi](https://github.com/tenje/JTrain/edit/master/JTrain%20-%20RPi/): This project is an implementation of the [JTrain - API](https://github.com/tenje/JTrain/tree/master/JTrain%20-%20API) to control a Raspberry Pi.
 
+[Runnables](https://github.com/tenje/JTrain/tree/master/JTrain%20-%20Runnables): This project contains some stand-alone programs (Java files with main(String[]) method) to realise a [DCC++](https://github.com/DccPlusPlus) controlled Raspberry Pi train or accessories.
+
 
