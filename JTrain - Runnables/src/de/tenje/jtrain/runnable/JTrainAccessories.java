@@ -1,0 +1,241 @@
+package de.tenje.jtrain.runnable;
+
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.InetAddress;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.MissingFormatArgumentException;
+
+import org.jdom2.Attribute;
+import org.jdom2.Document;
+import org.jdom2.Element;
+import org.jdom2.JDOMException;
+import org.jdom2.input.SAXBuilder;
+
+import com.pi4j.io.gpio.GpioController;
+import com.pi4j.io.gpio.GpioFactory;
+import com.pi4j.io.gpio.GpioPinDigitalInput;
+import com.pi4j.io.gpio.GpioPinDigitalOutput;
+import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.RaspiPin;
+
+import de.tenje.jtrain.AccessoryDecoderAddress;
+import de.tenje.jtrain.Sensor;
+import de.tenje.jtrain.Signal;
+import de.tenje.jtrain.SignalAspect;
+import de.tenje.jtrain.SignalAspectControlTurnout;
+import de.tenje.jtrain.Turnout;
+import de.tenje.jtrain.dccpp.impl.PacketFactoryImpl;
+import de.tenje.jtrain.dccpp.impl.PacketSensorRegistry;
+import de.tenje.jtrain.dccpp.impl.PacketTurnoutRegistry;
+import de.tenje.jtrain.dccpp.impl.SensorListeningPacketSender;
+import de.tenje.jtrain.dccpp.server.DccppSocket;
+import de.tenje.jtrain.rpi.RPiSensor;
+import de.tenje.jtrain.rpi.RPiSignal;
+import de.tenje.jtrain.rpi.RPiTurnout;
+
+/**
+ * A stand-alone program to control some accessories.
+ * 
+ * @author Jonas Tennié
+ */
+public class JTrainAccessories {
+
+	/**
+	 * Starts the program.
+	 * 
+	 * @param args
+	 *            The arguments containing the station host address in the first
+	 *            (0) index with format <code>address:port</code>.
+	 */
+	public static void main(String[] args) {
+		try {
+			start(args);
+		}
+		catch (Throwable t) {
+			System.err.print("Failed to start program: ");
+			if (t.getMessage() != null) {
+				System.err.println(t.getMessage());
+			}
+			else {
+				System.err.println(t.getClass().getName());
+			}
+			System.err.println();
+			System.err.println("Developer info:");
+			t.printStackTrace();
+		}
+	}
+
+	private static void start(String[] args) throws FileNotFoundException, JDOMException,
+			IOException, InterruptedException {
+		DccppSocket socket;
+		String[] addressParts;
+		InetAddress address;
+		int port;
+		if (args.length < 1) {
+			throw new IllegalArgumentException("no station address defined");
+		}
+		addressParts = args[0].split(":");
+		if (addressParts.length < 2) {
+			throw new IllegalArgumentException("no station port defined");
+		}
+		address = InetAddress.getByName(addressParts[0]);
+		port = Integer.parseInt(addressParts[1]);
+		// -
+
+		PacketSensorRegistry sensorRegistry = new PacketSensorRegistry();
+		PacketTurnoutRegistry turnoutRegistry = new PacketTurnoutRegistry();
+		SensorListeningPacketSender sensorListener = null;
+
+		SAXBuilder builder = new SAXBuilder();
+		Document document = builder.build(new FileInputStream("accessories.xml"));
+		Attribute attribute;
+		AccessoryDecoderAddress accessoryAddress;
+		for (Element accessoryElem : document.getRootElement().getChildren()) {
+			if (accessoryElem.getName().equals("signal")) {
+				Map<SignalAspect, GpioPinDigitalOutput> pins = new EnumMap<>(
+						SignalAspect.class);
+				Map<AccessoryDecoderAddress, SignalAspect> addresses = new HashMap<>();
+				Signal signal;
+				SignalAspect aspect;
+				AccessoryDecoderAddress aspectAddress = null;
+				GpioPinDigitalOutput pin;
+				for (Element aspectElem : accessoryElem.getChildren()) {
+					if ((attribute = aspectElem.getAttribute("color")) != null) {
+						aspect = SignalAspect.valueOf(attribute.getValue().toUpperCase());
+					}
+					else {
+						throw new MissingFormatArgumentException(
+								"no color defined: " + aspectElem);
+					}
+					if ((attribute = aspectElem.getAttribute("address")) != null) {
+						aspectAddress = new AccessoryDecoderAddress(
+								Integer.parseInt(attribute.getValue()), 0);
+					}
+					else {
+						throw new MissingFormatArgumentException(
+								"no address defined: " + accessoryElem);
+					}
+					pin = getOutputPin(aspectElem, "pin");
+					if (pins.put(aspect, pin) != null) {
+						throw new IllegalArgumentException(
+								"color already defined: " + aspect.name().toLowerCase());
+					}
+					if (addresses.put(aspectAddress, aspect) != null) {
+						throw new IllegalArgumentException("address already defined: "
+								+ aspectAddress.getMainAddress());
+					}
+				}
+				if (!pins.isEmpty()) {
+					signal = new RPiSignal(aspectAddress, pins);
+					for (Entry<AccessoryDecoderAddress, SignalAspect> entry : addresses
+							.entrySet()) {
+						turnoutRegistry.register(new SignalAspectControlTurnout(
+								entry.getKey(), signal, entry.getValue()));
+					}
+				}
+			}
+			else {
+				if ((attribute = accessoryElem.getAttribute("address")) != null) {
+					accessoryAddress = new AccessoryDecoderAddress(
+							Integer.parseInt(attribute.getValue()), 0);
+					switch (accessoryElem.getName()) {
+						case "sensor": {
+							Sensor sensor = new RPiSensor(accessoryAddress,
+									getInputPin(accessoryElem, "pin"));
+							sensorRegistry.register(sensor);
+						}
+						break;
+						case "turnout": {
+							int switchTime = 0;
+							if ((attribute = accessoryElem
+									.getAttribute("switchTime")) != null) {
+								switchTime = Integer.parseInt(attribute.getValue());
+							}
+							Turnout turnout = new RPiTurnout(accessoryAddress,
+									getOutputPin(accessoryElem, "straightPin"),
+									getOutputPin(accessoryElem, "thrownPin"), switchTime);
+							turnoutRegistry.register(turnout);
+						}
+						break;
+					}
+				}
+				else {
+					throw new MissingFormatArgumentException(
+							"no address defined: " + accessoryElem);
+				}
+			}
+		}
+
+		// --
+		System.out.println("Connecting to " + address + ":" + port + "...");
+		while (true) {
+			try {
+				socket = new DccppSocket(address, port);
+				System.out.println("Connected");
+			}
+			catch (IOException ex) {
+				Thread.sleep(1_000);
+				System.err.println("Connection failed. Retrying...");
+				continue; // Retry
+			}
+			PacketFactoryImpl.regiserDefaultPackets(socket.getPacketFactory());
+			socket.addPacketListener(sensorRegistry);
+			socket.addPacketListener(turnoutRegistry);
+			if (sensorListener == null) {
+				sensorListener = new SensorListeningPacketSender(sensorRegistry, socket,
+						socket.getConnectedBroker());
+			}
+			else {
+				sensorListener.setReceiver(socket.getConnectedBroker());
+			}
+			synchronized (socket) {
+				socket.wait(); // Wait until connection lost
+			}
+			System.err.println("Connection lost. Trying to reconnect...");
+		}
+	}
+
+	private static GpioPinDigitalInput getInputPin(Element elem, String name) {
+		GpioController gpio = GpioFactory.getInstance();
+		Attribute attribute;
+		if ((attribute = elem.getAttribute(name)) != null) {
+			Pin pin = RaspiPin.getPinByAddress(Integer.parseInt(attribute.getValue()));
+			if (pin != null) {
+				return gpio.provisionDigitalInputPin(pin);
+			}
+			else {
+				throw new IllegalArgumentException(
+						"pin does not exist: " + attribute.getValue());
+			}
+		}
+		else {
+			throw new MissingFormatArgumentException(
+					"pin attribute missing for " + elem + ": " + name);
+		}
+	}
+
+	private static GpioPinDigitalOutput getOutputPin(Element elem, String name) {
+		GpioController gpio = GpioFactory.getInstance();
+		Attribute attribute;
+		if ((attribute = elem.getAttribute(name)) != null) {
+			Pin pin = RaspiPin.getPinByAddress(Integer.parseInt(attribute.getValue()));
+			if (pin != null) {
+				return gpio.provisionDigitalOutputPin(pin);
+			}
+			else {
+				throw new IllegalArgumentException(
+						"pin does not exist: " + attribute.getValue());
+			}
+		}
+		else {
+			throw new MissingFormatArgumentException(
+					"pin attribute missing for " + elem + ": " + name);
+		}
+	}
+
+}
