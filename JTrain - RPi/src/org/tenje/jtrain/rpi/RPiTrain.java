@@ -13,7 +13,7 @@
  * along with this program. If not, see
  * <http://www.gnu.org/licenses/lgpl-3.0.html>.
  *******************************************************************************/
-package de.tenje.jtrain.rpi;
+package org.tenje.jtrain.rpi;
 
 import java.util.ArrayList;
 import java.util.List;
