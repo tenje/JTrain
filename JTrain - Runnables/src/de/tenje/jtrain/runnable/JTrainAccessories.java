@@ -30,6 +30,12 @@ import org.jdom2.Document;
 import org.jdom2.Element;
 import org.jdom2.JDOMException;
 import org.jdom2.input.SAXBuilder;
+import org.tenje.jtrain.AccessoryDecoderAddress;
+import org.tenje.jtrain.Sensor;
+import org.tenje.jtrain.Signal;
+import org.tenje.jtrain.SignalAspect;
+import org.tenje.jtrain.SignalAspectControlTurnout;
+import org.tenje.jtrain.Turnout;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
@@ -38,12 +44,6 @@ import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.RaspiPin;
 
-import de.tenje.jtrain.AccessoryDecoderAddress;
-import de.tenje.jtrain.Sensor;
-import de.tenje.jtrain.Signal;
-import de.tenje.jtrain.SignalAspect;
-import de.tenje.jtrain.SignalAspectControlTurnout;
-import de.tenje.jtrain.Turnout;
 import de.tenje.jtrain.dccpp.impl.PacketFactoryImpl;
 import de.tenje.jtrain.dccpp.impl.PacketSensorRegistry;
 import de.tenje.jtrain.dccpp.impl.PacketTurnoutRegistry;

@@ -15,7 +15,7 @@
  *******************************************************************************/
 package de.tenje.jtrain.dccpp;
 
-import de.tenje.jtrain.Addressable;
+import org.tenje.jtrain.Addressable;
 
 /**
  * A {@link Packet} to write a one-bit configuration variable to the decoder

@@ -17,11 +17,11 @@ package de.tenje.jtrain.rpi;
 
 import java.util.Objects;
 
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
+import org.tenje.jtrain.AbstractSwitchable;
+import org.tenje.jtrain.OutputPin;
+import org.tenje.jtrain.OutputPinAddress;
 
-import de.tenje.jtrain.AbstractSwitchable;
-import de.tenje.jtrain.OutputPin;
-import de.tenje.jtrain.OutputPinAddress;
+import com.pi4j.io.gpio.GpioPinDigitalOutput;
 
 /**
  * An {@link OutputPin} as wrapper for a {@link GpioPinDigitalOutput}.

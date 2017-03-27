@@ -19,8 +19,9 @@ import java.io.IOException;
 import java.lang.Thread.State;
 import java.util.Objects;
 
-import de.tenje.jtrain.Sensor;
-import de.tenje.jtrain.SensorListener;
+import org.tenje.jtrain.Sensor;
+import org.tenje.jtrain.SensorListener;
+
 import de.tenje.jtrain.dccpp.LocalPacketBroker;
 import de.tenje.jtrain.dccpp.Packet;
 import de.tenje.jtrain.dccpp.PacketBroker;

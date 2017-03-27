@@ -15,8 +15,8 @@
  *******************************************************************************/
 package de.tenje.jtrain.dccpp;
 
-import de.tenje.jtrain.AccessoryDecoderAddress;
-import de.tenje.jtrain.Addressable;
+import org.tenje.jtrain.AccessoryDecoderAddress;
+import org.tenje.jtrain.Addressable;
 
 /**
  * A {@link PacketTurnout} to define a turnout ID with an address and sub

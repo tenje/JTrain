@@ -18,13 +18,13 @@ package de.tenje.jtrain.rpi;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.tenje.jtrain.AbstractTrain;
+import org.tenje.jtrain.LongTrainAddress;
+import org.tenje.jtrain.Train;
+import org.tenje.jtrain.TrainDirection;
+
 import com.pi4j.wiringpi.Gpio;
 import com.pi4j.wiringpi.SoftPwm;
-
-import de.tenje.jtrain.AbstractTrain;
-import de.tenje.jtrain.LongTrainAddress;
-import de.tenje.jtrain.Train;
-import de.tenje.jtrain.TrainDirection;
 
 /**
  * A {@link Train} controlled by a Raspberry Pi. Acceleration is supported by

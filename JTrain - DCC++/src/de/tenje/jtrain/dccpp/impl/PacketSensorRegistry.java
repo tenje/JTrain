@@ -18,13 +18,14 @@ package de.tenje.jtrain.dccpp.impl;
 import java.io.IOException;
 import java.util.Map.Entry;
 
-import de.tenje.jtrain.AbstractInputRegistry;
-import de.tenje.jtrain.AccessoryDecoderAddress;
-import de.tenje.jtrain.Address;
-import de.tenje.jtrain.AddressRegistry;
-import de.tenje.jtrain.InputRegistry;
-import de.tenje.jtrain.Sensor;
-import de.tenje.jtrain.SimpleAddressRegistry;
+import org.tenje.jtrain.AbstractInputRegistry;
+import org.tenje.jtrain.AccessoryDecoderAddress;
+import org.tenje.jtrain.Address;
+import org.tenje.jtrain.AddressRegistry;
+import org.tenje.jtrain.InputRegistry;
+import org.tenje.jtrain.Sensor;
+import org.tenje.jtrain.SimpleAddressRegistry;
+
 import de.tenje.jtrain.dccpp.LocalPacketBroker;
 import de.tenje.jtrain.dccpp.Packet;
 import de.tenje.jtrain.dccpp.PacketBroker;

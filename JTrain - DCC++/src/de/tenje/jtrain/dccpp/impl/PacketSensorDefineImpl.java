@@ -19,8 +19,9 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import de.tenje.jtrain.AccessoryDecoderAddress;
-import de.tenje.jtrain.ParameterValidator;
+import org.tenje.jtrain.AccessoryDecoderAddress;
+import org.tenje.jtrain.ParameterValidator;
+
 import de.tenje.jtrain.dccpp.PacketBuilder;
 import de.tenje.jtrain.dccpp.PacketSensorDefine;
 

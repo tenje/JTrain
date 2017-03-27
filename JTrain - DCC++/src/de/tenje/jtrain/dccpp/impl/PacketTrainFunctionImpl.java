@@ -21,7 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import de.tenje.jtrain.LongTrainAddress;
+import org.tenje.jtrain.LongTrainAddress;
+
 import de.tenje.jtrain.dccpp.PacketBuilder;
 import de.tenje.jtrain.dccpp.PacketTrainFunction;
 

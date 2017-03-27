@@ -17,16 +17,18 @@ package de.tenje.jtrain.dccpp.impl;
 
 import java.io.IOException;
 import java.util.Map.Entry;
+
+import org.tenje.jtrain.AbstractOutputRegistry;
+import org.tenje.jtrain.AccessoryDecoderAddress;
+import org.tenje.jtrain.Address;
+import org.tenje.jtrain.AddressRegistry;
+import org.tenje.jtrain.AddressableSwitchable;
+import org.tenje.jtrain.OutputRegistry;
+import org.tenje.jtrain.SimpleAddressRegistry;
+import org.tenje.jtrain.Switchable;
+
 import java.util.Set;
 
-import de.tenje.jtrain.AbstractOutputRegistry;
-import de.tenje.jtrain.AccessoryDecoderAddress;
-import de.tenje.jtrain.Address;
-import de.tenje.jtrain.AddressRegistry;
-import de.tenje.jtrain.AddressableSwitchable;
-import de.tenje.jtrain.OutputRegistry;
-import de.tenje.jtrain.SimpleAddressRegistry;
-import de.tenje.jtrain.Switchable;
 import de.tenje.jtrain.dccpp.LocalPacketBroker;
 import de.tenje.jtrain.dccpp.Packet;
 import de.tenje.jtrain.dccpp.PacketBroker;

@@ -15,8 +15,8 @@
  *******************************************************************************/
 package de.tenje.jtrain.dccpp;
 
-import de.tenje.jtrain.Addressable;
-import de.tenje.jtrain.OutputPinAddress;
+import org.tenje.jtrain.Addressable;
+import org.tenje.jtrain.OutputPinAddress;
 
 /**
  * A {@link PacketOutputPin} to define an output pin. Default pin state and pin

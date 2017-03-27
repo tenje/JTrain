@@ -18,7 +18,8 @@ package de.tenje.jtrain.dccpp.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import de.tenje.jtrain.ParameterValidator;
+import org.tenje.jtrain.ParameterValidator;
+
 import de.tenje.jtrain.dccpp.PacketBuilder;
 import de.tenje.jtrain.dccpp.PacketReadConfigurationByte;
 

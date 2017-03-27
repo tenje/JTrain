@@ -18,8 +18,8 @@ package de.tenje.jtrain.dccpp;
 import java.util.Collections;
 import java.util.Map;
 
-import de.tenje.jtrain.Addressable;
-import de.tenje.jtrain.LongTrainAddress;
+import org.tenje.jtrain.Addressable;
+import org.tenje.jtrain.LongTrainAddress;
 
 /**
  * A {@link Packet} to enable or disable a train/loco function. The packet data

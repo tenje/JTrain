@@ -17,13 +17,13 @@ package de.tenje.jtrain.rpi;
 
 import java.util.Objects;
 
+import org.tenje.jtrain.AbstractSensor;
+import org.tenje.jtrain.AccessoryDecoderAddress;
+import org.tenje.jtrain.Sensor;
+
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.event.GpioPinDigitalStateChangeEvent;
 import com.pi4j.io.gpio.event.GpioPinListenerDigital;
-
-import de.tenje.jtrain.AbstractSensor;
-import de.tenje.jtrain.AccessoryDecoderAddress;
-import de.tenje.jtrain.Sensor;
 
 /**
  * A {@link Sensor} as wrapper for a {@link GpioPinDigitalInput}. The address is

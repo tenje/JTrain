@@ -17,10 +17,11 @@ package de.tenje.jtrain.dccpp.impl;
 
 import java.io.IOException;
 
-import de.tenje.jtrain.AddressRegistry;
-import de.tenje.jtrain.Signal;
-import de.tenje.jtrain.SignalAspect;
-import de.tenje.jtrain.SimpleAddressRegistry;
+import org.tenje.jtrain.AddressRegistry;
+import org.tenje.jtrain.Signal;
+import org.tenje.jtrain.SignalAspect;
+import org.tenje.jtrain.SimpleAddressRegistry;
+
 import de.tenje.jtrain.dccpp.LocalPacketBroker;
 import de.tenje.jtrain.dccpp.Packet;
 import de.tenje.jtrain.dccpp.PacketBroker;

@@ -19,11 +19,11 @@ import java.util.Objects;
 import java.util.Timer;
 import java.util.TimerTask;
 
-import com.pi4j.io.gpio.GpioPinDigitalOutput;
+import org.tenje.jtrain.AbstractSwitchable;
+import org.tenje.jtrain.AccessoryDecoderAddress;
+import org.tenje.jtrain.Turnout;
 
-import de.tenje.jtrain.AbstractSwitchable;
-import de.tenje.jtrain.AccessoryDecoderAddress;
-import de.tenje.jtrain.Turnout;
+import com.pi4j.io.gpio.GpioPinDigitalOutput;
 
 /**
  * A {@link Turnout} which is controlled by two Raspberry Pi GPIO pins.

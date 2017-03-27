@@ -19,14 +19,15 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 import java.util.Map.Entry;
+
+import org.tenje.jtrain.AccessoryDecoderAddress;
+import org.tenje.jtrain.Signal;
+import org.tenje.jtrain.SignalAspect;
+
 import java.util.Objects;
 import java.util.Set;
 
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
-
-import de.tenje.jtrain.AccessoryDecoderAddress;
-import de.tenje.jtrain.Signal;
-import de.tenje.jtrain.SignalAspect;
 
 /**
  * A {@link Signal} which is controlled by Raspberry Pi GPIO pins.

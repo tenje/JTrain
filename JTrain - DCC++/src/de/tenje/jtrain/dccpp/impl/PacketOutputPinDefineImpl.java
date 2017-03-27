@@ -19,7 +19,8 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
-import de.tenje.jtrain.OutputPinAddress;
+import org.tenje.jtrain.OutputPinAddress;
+
 import de.tenje.jtrain.dccpp.PacketBuilder;
 import de.tenje.jtrain.dccpp.PacketOutputPinDefine;
 

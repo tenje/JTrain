@@ -15,8 +15,8 @@
  *******************************************************************************/
 package de.tenje.jtrain.dccpp;
 
-import de.tenje.jtrain.AccessoryDecoderAddress;
-import de.tenje.jtrain.Addressable;
+import org.tenje.jtrain.AccessoryDecoderAddress;
+import org.tenje.jtrain.Addressable;
 
 /**
  * A {@link Packet} to turn an accessory (stationary) decoder's output on or

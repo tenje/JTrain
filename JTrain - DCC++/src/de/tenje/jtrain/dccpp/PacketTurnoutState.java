@@ -15,7 +15,7 @@
  *******************************************************************************/
 package de.tenje.jtrain.dccpp;
 
-import de.tenje.jtrain.Addressable;
+import org.tenje.jtrain.Addressable;
 
 /**
  * A packet to set the state of a turnout. This interface is not a sub type of

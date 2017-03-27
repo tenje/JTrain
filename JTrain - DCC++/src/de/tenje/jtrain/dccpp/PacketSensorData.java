@@ -15,9 +15,9 @@
  *******************************************************************************/
 package de.tenje.jtrain.dccpp;
 
-import de.tenje.jtrain.AccessoryDecoderAddress;
-import de.tenje.jtrain.Addressable;
-import de.tenje.jtrain.Sensor;
+import org.tenje.jtrain.AccessoryDecoderAddress;
+import org.tenje.jtrain.Addressable;
+import org.tenje.jtrain.Sensor;
 
 /**
  * A {@link Packet} to send the data of a defined {@link Sensor}.

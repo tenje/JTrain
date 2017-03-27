@@ -17,12 +17,14 @@ package de.tenje.jtrain.dccpp.impl;
 
 import java.io.IOException;
 import java.util.Map.Entry;
+
+import org.tenje.jtrain.Address;
+import org.tenje.jtrain.Addressable;
+import org.tenje.jtrain.Train;
+import org.tenje.jtrain.TrainFunction;
+
 import java.util.Objects;
 
-import de.tenje.jtrain.Address;
-import de.tenje.jtrain.Addressable;
-import de.tenje.jtrain.Train;
-import de.tenje.jtrain.TrainFunction;
 import de.tenje.jtrain.dccpp.LocalPacketBroker;
 import de.tenje.jtrain.dccpp.Packet;
 import de.tenje.jtrain.dccpp.PacketBroker;

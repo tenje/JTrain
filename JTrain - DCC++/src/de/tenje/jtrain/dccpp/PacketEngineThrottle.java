@@ -15,9 +15,9 @@
  *******************************************************************************/
 package de.tenje.jtrain.dccpp;
 
-import de.tenje.jtrain.Addressable;
-import de.tenje.jtrain.LongTrainAddress;
-import de.tenje.jtrain.TrainDirection;
+import org.tenje.jtrain.Addressable;
+import org.tenje.jtrain.LongTrainAddress;
+import org.tenje.jtrain.TrainDirection;
 
 /**
  * A {@link Packet} to set a train's speed and direction.

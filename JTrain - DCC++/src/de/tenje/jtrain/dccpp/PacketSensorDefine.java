@@ -15,8 +15,8 @@
  *******************************************************************************/
 package de.tenje.jtrain.dccpp;
 
-import de.tenje.jtrain.AccessoryDecoderAddress;
-import de.tenje.jtrain.Addressable;
+import org.tenje.jtrain.AccessoryDecoderAddress;
+import org.tenje.jtrain.Addressable;
 
 /**
  * {@link PacketSensor} to define a sensor.

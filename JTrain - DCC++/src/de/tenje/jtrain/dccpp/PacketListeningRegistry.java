@@ -15,7 +15,7 @@
  *******************************************************************************/
 package de.tenje.jtrain.dccpp;
 
-import de.tenje.jtrain.AddressRegistry;
+import org.tenje.jtrain.AddressRegistry;
 
 /**
  * A registry which listens to {@link Packet}s that change registry entries.

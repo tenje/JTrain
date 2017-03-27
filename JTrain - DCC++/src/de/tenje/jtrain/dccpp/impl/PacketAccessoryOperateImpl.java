@@ -18,7 +18,8 @@ package de.tenje.jtrain.dccpp.impl;
 import java.util.Arrays;
 import java.util.List;
 
-import de.tenje.jtrain.AccessoryDecoderAddress;
+import org.tenje.jtrain.AccessoryDecoderAddress;
+
 import de.tenje.jtrain.dccpp.PacketAccessoryOperate;
 import de.tenje.jtrain.dccpp.PacketBuilder;
 
