@@ -27,6 +27,7 @@ import java.util.Set;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
+import javax.sound.sampled.Line;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.UnsupportedAudioFileException;
 
@@ -285,7 +286,9 @@ public class JTrainRPiTrain {
 			order = Order.RANDOM;
 		}
 		for (Element soundElem : soundElems) {
-			Clip clip = AudioSystem.getClip();
+			Line.Info linfo = new Line.Info(Clip.class);
+			Line line = AudioSystem.getLine(linfo);
+			Clip clip = (Clip) line;
 			clip.open(AudioSystem
 					.getAudioInputStream(new File(soundElem.getTextNormalize())));
 			clips.add(clip);
