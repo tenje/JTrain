@@ -301,7 +301,9 @@ public class JTrainRPiTrain {
 		Element child;
 		Clip enableClip, loopClip, disableClip;
 		if ((child = functionElem.getChild("enableSound")) != null) {
-			enableClip = AudioSystem.getClip();
+			Line.Info linfo = new Line.Info(Clip.class);
+			Line line = AudioSystem.getLine(linfo);
+			enableClip = (Clip) line;
 			enableClip.open(
 					AudioSystem.getAudioInputStream(new File(child.getTextNormalize())));
 		}
@@ -309,7 +311,9 @@ public class JTrainRPiTrain {
 			enableClip = null;
 		}
 		if ((child = functionElem.getChild("loopSound")) != null) {
-			loopClip = AudioSystem.getClip();
+			Line.Info linfo = new Line.Info(Clip.class);
+			Line line = AudioSystem.getLine(linfo);
+			loopClip = (Clip) line;
 			loopClip.open(
 					AudioSystem.getAudioInputStream(new File(child.getTextNormalize())));
 		}
@@ -318,7 +322,9 @@ public class JTrainRPiTrain {
 					"no loop sound defined: " + functionElem);
 		}
 		if ((child = functionElem.getChild("enableSound")) != null) {
-			disableClip = AudioSystem.getClip();
+			Line.Info linfo = new Line.Info(Clip.class);
+			Line line = AudioSystem.getLine(linfo);
+			disableClip = (Clip) line;
 			disableClip.open(
 					AudioSystem.getAudioInputStream(new File(child.getTextNormalize())));
 		}
