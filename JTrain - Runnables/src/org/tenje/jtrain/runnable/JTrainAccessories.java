@@ -110,7 +110,7 @@ public class JTrainAccessories {
 		Attribute attribute;
 		AccessoryDecoderAddress accessoryAddress;
 		for (Element accessoryElem : document.getRootElement().getChildren()) {
-			if (accessoryElem.getName().equals("signal")) {
+			if (accessoryElem.getName().equals("lightSignal")) {
 				Map<SignalAspect, GpioPinDigitalOutput> pins = new EnumMap<>(
 						SignalAspect.class);
 				Map<AccessoryDecoderAddress, SignalAspect> addresses = new HashMap<>();
