@@ -1,0 +1,39 @@
+<!-- A train which listens to address 10, GPIO pin 0 is used for forward direction, GPIO pin 1 is used for reverse direction, the acceleration is 26 steps/second (0%->100% in 10 seconds), the minimal motor power is 30% (speed step 1), the maximum motor power is 100% (speed step 126) -->
+	<train address="10" forwardPin="0" reversePin="1" acceleration="26" minPower="30" maxPower="100">
+
+	<!-- The configuration of all functions -->
+		<functions>
+
+			<!-- If function 1 is enabled: pin 4 is HIGH when direction is forward, pin 5 is HIGH if direction is reverse. Otheriwse pins are LOW -->
+			<gpioFunction id="1" forwardPin="4" reversePin="5" />
+
+			<!-- Pin 6 is HIGH when function 2 is enabled, else LOW -->
+			<gpioFunction id="2" pin="6" />
+
+			<!-- When function 3 gets enabled a random sound of {sounds/horn1.wav, sounds/horn2.wav} is played. Order attribute defines play order. -->
+			<volatileSoundFunction id="3" order="random">
+				<sound>sounds/horn1.wav</sound>
+				<sound>sounds/horn2.wav</sound>
+			</volatileSoundFunction>
+
+			<!-- When function 4 gets enabled, "sounds/engine_start.wav" is played once, after that "sounds/engine_loop.wav" is played in a loop. When function 4 gets disabled, loop.wav is stopped and "sounds/engine_stop.wav" is played once. -->
+			<permanentSoundFunction id="4">
+				<enableSound>sounds/engine_start.wav</enableSound>
+				<loopSound>sounds/engine_loop.wav</loopSound>
+				<disableSound>sounds/engine_stop.wav</disableSound>
+			</permanentSoundFunction>
+				
+			<!-- The following functions listen to function 5 -->
+			<functionCollection id="5">
+					
+				<!-- No order defined as only one sound is defined -->
+				<volatileSoundFunction>
+					<sound>sounds/my_sound.wav</sound>
+				</volatileSoundFunction>
+					
+				<!-- Pin 8 is HIGH when function 5 is enabled, else LOW -->
+				<gpioFunction pin="8" />
+		
+			</functionCollection>
+		</functions>
+	</train>
