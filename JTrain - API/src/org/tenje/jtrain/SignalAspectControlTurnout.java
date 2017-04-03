@@ -19,9 +19,8 @@ import java.util.Objects;
 
 /**
  * A {@link Turnout} which controls a single {@link Signal}'s
- * {@link SignalAspect}. Switch state set by {@link #setSwitched(boolean)} is
- * ignored. The signal's state is set if <code>switched</code> value is
- * <code>true</code> or <code>false</code>.
+ * {@link SignalAspect}. Switch state set by {@link #setSwitched(boolean)} must
+ * be <code>true</code> to set signal state.
  * 
  * @author Jonas Tennié
  */
@@ -55,20 +54,14 @@ public class SignalAspectControlTurnout extends AbstractSwitchable implements Tu
 	}
 
 	/**
-	 * Sets the {@link SignalAspect} of the handled {@link Signal} to the
-	 * handled aspect.
-	 */
-	@Override
-	public void toggle() {
-		signal.setAspect(aspect);
-	}
-
-	/**
-	 * Equivalent to {@link #toggle()}.
+	 * Sets the signal state to the defined state if {@code switched} is
+	 * {@code true}, does nothing otherwise.
 	 */
 	@Override
 	public void setSwitched(boolean switched) {
-		signal.setAspect(aspect);
+		if (switched) {
+			signal.setAspect(aspect);
+		}
 	}
 
 	/**
