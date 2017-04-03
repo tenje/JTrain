@@ -30,7 +30,8 @@ import org.tenje.jtrain.dccpp.PacketSensorDefine;
  * 
  * @author Jonas Tennié
  */
-public class PacketSensorDefineImpl extends PacketSensorImpl implements PacketSensorDefine {
+public class PacketSensorDefineImpl extends PacketSensorImpl
+		implements PacketSensorDefine {
 
 	/**
 	 * {@link PacketBuilder} to build a {@link PacketSensorDefine}.
@@ -62,8 +63,10 @@ public class PacketSensorDefineImpl extends PacketSensorImpl implements PacketSe
 	 * @throws NullPointerException
 	 *             Thrown if <code>address</code> is <code>null</code>.
 	 */
-	public PacketSensorDefineImpl(int id, AccessoryDecoderAddress address, @Deprecated boolean usePullUp) {
-		super(Arrays.asList(String.valueOf(id), String.valueOf(address.getAddress()), usePullUp ? "1" : "0"));
+	public PacketSensorDefineImpl(int id, AccessoryDecoderAddress address,
+			@Deprecated boolean usePullUp) {
+		super(Arrays.asList(String.valueOf(id), String.valueOf(address.getAddress()),
+				usePullUp ? "1" : "0"));
 		this.id = ParameterValidator.validateRegistrationId(id);
 		this.address = Objects.requireNonNull(address, "address");
 		this.usePullUp = usePullUp;
@@ -76,12 +79,13 @@ public class PacketSensorDefineImpl extends PacketSensorImpl implements PacketSe
 	 * @param parameters
 	 *            The raw packet parameters. The first index (0) is the id. The
 	 *            second index (1) is the address. The third index (2) is the
-	 *            use pull-up value ({@code "1"} for <code>true</code>, other value
-	 *            (not <code>null</code>) for <code>false</code>).
+	 *            use pull-up value ({@code "1"} for <code>true</code>, other
+	 *            value (not <code>null</code>) for <code>false</code>).
 	 * @throws IllegalArgumentException
 	 *             Thrown if id does not lay in range (0-32767).
 	 * @throws NumberFormatException
-	 *             Thrown if index 0 or 1 is not a number or is <code>null</code>.
+	 *             Thrown if index 0 or 1 is not a number or is
+	 *             <code>null</code>.
 	 * @throws IndexOutOfBoundsException
 	 *             Thrown if size of <code>parameters</code> less than three.
 	 * @throws NullPointerException
@@ -89,7 +93,8 @@ public class PacketSensorDefineImpl extends PacketSensorImpl implements PacketSe
 	 */
 	public PacketSensorDefineImpl(List<String> parameters) {
 		super(parameters);
-		id = ParameterValidator.validateRegistrationId(Integer.parseInt(parameters.get(0)));
+		id = ParameterValidator
+				.validateRegistrationId(Integer.parseInt(parameters.get(0)));
 		address = new AccessoryDecoderAddress(Integer.parseInt(parameters.get(1)), 0);
 		usePullUp = parameters.get(2).equals("1");
 	}
