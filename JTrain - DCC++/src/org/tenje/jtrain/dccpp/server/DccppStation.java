@@ -58,7 +58,6 @@ import org.tenje.jtrain.dccpp.impl.PacketTurnoutDefineImpl;
 public class DccppStation implements PacketListener {
 
 	private final DccppServerSocket controllerSocket, accessorySocket;
-	private final PacketFactory packetFactory = new PacketFactoryImpl();
 	private final Set<TurnoutEntry> turnuts = new HashSet<>();
 	private final Set<OutputPinEntry> outputPins = new HashSet<>();
 	private final Set<SensorEntry> sensors = new HashSet<>();
@@ -71,6 +70,9 @@ public class DccppStation implements PacketListener {
 	 *            The port for controllers.
 	 * @param accessoryPort
 	 *            The port for accessories
+	 * @param packetFactory
+	 *            The packet factory to use. <code>null</code> to create a new
+	 *            object.
 	 * @throws IOException
 	 *             Thrown if an I/O error occurs when opening one of the
 	 *             sockets.
@@ -83,10 +85,11 @@ public class DccppStation implements PacketListener {
 	 *             {@code SecurityManager#checkConnect(String, int)} method
 	 *             doesn't allow the operation.
 	 */
-	public DccppStation(int controllerPort, int accessoryPort) throws IOException {
-		controllerSocket = new DccppServerSocket(controllerPort);
+	public DccppStation(int controllerPort, int accessoryPort,
+			PacketFactory packetFactory) throws IOException {
+		controllerSocket = new DccppServerSocket(controllerPort, packetFactory);
 		try {
-			accessorySocket = new DccppServerSocket(accessoryPort);
+			accessorySocket = new DccppServerSocket(accessoryPort, packetFactory);
 		}
 		catch (IOException ex) { // Close controller socket on failure
 			controllerSocket.close();
