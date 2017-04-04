@@ -65,7 +65,7 @@ public class PacketSensorDefineImpl extends PacketSensorImpl
 	 */
 	public PacketSensorDefineImpl(int id, AccessoryDecoderAddress address,
 			@Deprecated boolean usePullUp) {
-		super(Arrays.asList(String.valueOf(id), String.valueOf(address.getAddress()),
+		super(Arrays.asList(String.valueOf(id), String.valueOf(address.getMainAddress()),
 				usePullUp ? "1" : "0"));
 		this.id = ParameterValidator.validateRegistrationId(id);
 		this.address = Objects.requireNonNull(address, "address");
