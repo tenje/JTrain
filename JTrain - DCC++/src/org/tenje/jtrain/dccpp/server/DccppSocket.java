@@ -21,6 +21,7 @@ import java.net.Socket;
 
 import org.tenje.jtrain.dccpp.Packet;
 import org.tenje.jtrain.dccpp.PacketBroker;
+import org.tenje.jtrain.dccpp.PacketFactory;
 import org.tenje.jtrain.dccpp.PacketListener;
 
 /**
@@ -40,7 +41,8 @@ public class DccppSocket extends AbstractDccppSocket {
 
 	/**
 	 * Constructs a new {@link DccppSocket} and connects it to the specified
-	 * port number at the specified IP address.
+	 * port number at the specified IP address. Creates a new
+	 * {@link PacketFactory} object.
 	 * 
 	 * @param address
 	 *            The IP address of the remote.
@@ -60,8 +62,38 @@ public class DccppSocket extends AbstractDccppSocket {
 	 *             doesn't allow the operation.
 	 * @see Socket#Socket(String, int)
 	 */
-	public DccppSocket(final InetAddress address, final int port) throws IOException {
-		super(address, port);
+	public DccppSocket(InetAddress address, int port) throws IOException {
+		this(address, port, null);
+	}
+
+	/**
+	 * Constructs a new {@link DccppSocket} and connects it to the specified
+	 * port number at the specified IP address.
+	 * 
+	 * @param address
+	 *            The IP address of the remote.
+	 * @param port
+	 *            The port number of the remote.
+	 * @param packetFactory
+	 *            The packet factory to use. <code>null</code> to create a new
+	 *            object.
+	 * @throws IOException
+	 *             Thrown if an I/O error occurs when creating the socket.
+	 * @throws IllegalArgumentException
+	 *             Thrown if the port parameter is outside the specified range
+	 *             of valid port values, which is between 0 and 65535,
+	 *             inclusive.
+	 * @throws NullPointerException
+	 *             Thrown if <code>address</code> is <code>null</code>.
+	 * @throws SecurityException
+	 *             Thrown if a security manager exists and its
+	 *             {@code SecurityManager#checkConnect(String, int)} method
+	 *             doesn't allow the operation.
+	 * @see Socket#Socket(String, int)
+	 */
+	public DccppSocket(final InetAddress address, final int port,
+			PacketFactory packetFactory) throws IOException {
+		super(address, port, packetFactory);
 		socket = new Socket(address, port);
 		out = new PacketOutputStream(socket.getOutputStream());
 		connectedBroker = new SocketPacketBroker() {
