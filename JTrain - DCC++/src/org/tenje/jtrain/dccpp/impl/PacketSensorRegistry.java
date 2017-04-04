@@ -143,7 +143,6 @@ public class PacketSensorRegistry extends AbstractInputRegistry<Sensor>
 
 	@Override
 	public void sensorStateChanged(Sensor sensor) {
-		System.out.println(sensor.isTriggered());
 		int id = addressRegistry.getId(sensor.getAddress());
 		if (id >= 0) {
 			if (sensor.isTriggered()) {
