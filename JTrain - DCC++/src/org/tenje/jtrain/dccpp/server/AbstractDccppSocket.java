@@ -87,7 +87,7 @@ public abstract class AbstractDccppSocket implements AutoCloseable, LocalPacketB
 	 * @return <code>true</code> if the listener was removed, <code>false</code> if the
 	 *         listener was not registered or <code>null</code> was passed.
 	 */
-	public boolean removeListener(PacketListener listener) {
+	public boolean removePacketListener(PacketListener listener) {
 		return listeners.remove(listener);
 	}
 
