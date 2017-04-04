@@ -38,6 +38,7 @@ import org.tenje.jtrain.Signal;
 import org.tenje.jtrain.SignalAspect;
 import org.tenje.jtrain.SignalAspectControlTurnout;
 import org.tenje.jtrain.Turnout;
+import org.tenje.jtrain.dccpp.PacketFactory;
 import org.tenje.jtrain.dccpp.impl.PacketFactoryImpl;
 import org.tenje.jtrain.dccpp.impl.PacketSensorRegistry;
 import org.tenje.jtrain.dccpp.impl.PacketTurnoutRegistry;
@@ -103,6 +104,8 @@ public class JTrainAccessories {
 		port = Integer.parseInt(addressParts[1]);
 		// -
 
+		PacketFactory packetFactory = new PacketFactoryImpl();
+		PacketFactoryImpl.regiserDefaultPackets(packetFactory);
 		PacketSensorRegistry sensorRegistry = null;
 		PacketTurnoutRegistry turnoutRegistry = new PacketTurnoutRegistry();
 
@@ -191,7 +194,7 @@ public class JTrainAccessories {
 		System.out.println("Connecting to " + address + ":" + port + "...");
 		while (true) {
 			try {
-				socket = new DccppSocket(address, port);
+				socket = new DccppSocket(address, port, packetFactory);
 				System.out.println("Connected");
 			}
 			catch (IOException ex) {
@@ -199,7 +202,6 @@ public class JTrainAccessories {
 				System.err.println("Connection failed. Retrying...");
 				continue; // Retry
 			}
-			PacketFactoryImpl.regiserDefaultPackets(socket.getPacketFactory());
 			if (sensorRegistry == null) {
 				sensorRegistry = new PacketSensorRegistry(socket,
 						socket.getConnectedBroker());
