@@ -65,11 +65,36 @@ public class DccppStation implements PacketListener {
 	/**
 	 * Constructs a new {@link DccppStation} and starts a server socket for
 	 * controllers and a server socket for accessories on the specified ports.
+	 * Creates a new {@link PacketFactory} object.
 	 * 
 	 * @param controllerPort
 	 *            The port for controllers.
 	 * @param accessoryPort
-	 *            The port for accessories
+	 *            The port for accessories.
+	 * @throws IOException
+	 *             Thrown if an I/O error occurs when opening one of the
+	 *             sockets.
+	 * @throws IllegalArgumentException
+	 *             Thrown if one of the port parameters is outside the specified
+	 *             range of valid port values, which is between 0 and 65535,
+	 *             inclusive.
+	 * @throws SecurityException
+	 *             Thrown if a security manager exists and its
+	 *             {@code SecurityManager#checkConnect(String, int)} method
+	 *             doesn't allow the operation.
+	 */
+	public DccppStation(int controllerPort, int accessoryPort) throws IOException {
+		this(controllerPort, accessoryPort, null);
+	}
+
+	/**
+	 * Constructs a new {@link DccppStation} and starts a server socket for
+	 * controllers and a server socket for accessories on the specified ports.
+	 * 
+	 * @param controllerPort
+	 *            The port for controllers.
+	 * @param accessoryPort
+	 *            The port for accessories.
 	 * @param packetFactory
 	 *            The packet factory to use. <code>null</code> to create a new
 	 *            object.
