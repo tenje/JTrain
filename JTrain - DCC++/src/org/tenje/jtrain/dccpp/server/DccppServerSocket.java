@@ -110,6 +110,7 @@ public class DccppServerSocket extends AbstractDccppSocket {
 		for (DccppServerSocketListener listener : serverSocketListeners) {
 			listener.connectionAccepted(connectedBroker, this);
 		}
+		fireEvent(SocketEventType.BROKER_CONNECT, connectedBroker);
 	}
 
 	/**
@@ -157,6 +158,7 @@ public class DccppServerSocket extends AbstractDccppSocket {
 			catch (IOException ex2) {}
 			socketsByBroker.remove(receiver);
 			socketOuts.remove(socket);
+			fireEvent(SocketEventType.BROKER_DISCONNECT, receiver);
 			throw ex;
 		}
 	}

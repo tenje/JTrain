@@ -83,6 +83,7 @@ public class DccppSocket extends AbstractDccppSocket {
 					}
 				});
 		thread.start();
+		fireEvent(SocketEventType.BROKER_CONNECT, connectedBroker);
 	}
 
 	@Override

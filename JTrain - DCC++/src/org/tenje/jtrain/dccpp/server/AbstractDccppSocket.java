@@ -66,6 +66,7 @@ public abstract class AbstractDccppSocket
 
 	@Override
 	public void close() throws IOException {
+		fireEvent(SocketEventType.SOCKET_CLOSE, null);
 		packetListeners.clear();
 	}
 
