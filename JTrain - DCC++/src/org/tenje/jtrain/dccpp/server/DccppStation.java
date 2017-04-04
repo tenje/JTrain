@@ -100,9 +100,7 @@ public class DccppStation implements PacketListener {
 		accessorySocket.addSocketListener(new SocketListener() {
 			@Override
 			public void socketEvent(SocketEvent event) {
-				System.out.println("Con");
 				try {
-					System.out.println(sensors);
 					for (TurnoutEntry entry : turnuts) {
 						accessorySocket.sendPacket(
 								new PacketTurnoutDefineImpl(entry.id, entry.address),
