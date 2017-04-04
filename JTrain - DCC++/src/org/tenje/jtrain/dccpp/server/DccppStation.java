@@ -112,6 +112,10 @@ public class DccppStation implements PacketListener {
 	 */
 	public DccppStation(int controllerPort, int accessoryPort,
 			PacketFactory packetFactory) throws IOException {
+		if (packetFactory == null) {
+			packetFactory = new PacketFactoryImpl();
+		}
+		PacketFactoryImpl.regiserDefaultPackets(packetFactory);
 		controllerSocket = new DccppServerSocket(controllerPort, packetFactory);
 		try {
 			accessorySocket = new DccppServerSocket(accessoryPort, packetFactory);
@@ -120,11 +124,8 @@ public class DccppStation implements PacketListener {
 			controllerSocket.close();
 			throw ex;
 		}
-		PacketFactoryImpl.regiserDefaultPackets(packetFactory);
 		controllerSocket.addPacketListener(this);
 		accessorySocket.addPacketListener(this);
-		controllerSocket.setPacketFactory(packetFactory);
-		accessorySocket.setPacketFactory(packetFactory);
 		accessorySocket.addSocketListener(new SocketListener() {
 			@Override
 			public void socketEvent(SocketEvent event) {

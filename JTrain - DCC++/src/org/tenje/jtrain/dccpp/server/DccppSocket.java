@@ -111,7 +111,9 @@ public class DccppSocket extends AbstractDccppSocket {
 				socket.getInputStream(), new Runnable() {
 					@Override
 					public void run() {
-						DccppSocket.this.notifyAll();
+						synchronized (DccppSocket.this) {
+							DccppSocket.this.notifyAll();
+						}
 					}
 				});
 		thread.start();

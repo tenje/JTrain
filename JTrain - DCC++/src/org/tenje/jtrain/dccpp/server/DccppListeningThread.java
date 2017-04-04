@@ -59,9 +59,6 @@ class DccppListeningThread extends Thread {
 							l.packetReceived(packet, connectedBroker, socket);
 						}
 						catch (IOException ex) {
-							System.err.println("Debug: ");
-							ex.printStackTrace();
-							System.err.println();
 							throw ex; // Ends thread
 						}
 						catch (Exception ex) {
