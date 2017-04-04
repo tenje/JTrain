@@ -47,21 +47,55 @@ public abstract class AbstractDccppSocket
 	private final Set<PacketListener> packetListeners = new HashSet<>();
 	private final Set<PacketListener> unmodifiablePacketListeners = Collections
 			.unmodifiableSet(packetListeners);
-	private PacketFactory packetFactory = new PacketFactoryImpl();
+	private PacketFactory packetFactory;
 
 	/**
 	 * Constructs a new {@link AbstractDccppSocket} with the specified
-	 * <code>address</code> and <code>port</code>. No argument validation is
-	 * made.
+	 * <code>address</code> and <code>port</code>. Creates a new
+	 * {@link PacketFactory} object.
 	 * 
 	 * @param address
 	 *            The address.
 	 * @param port
 	 *            The port.
+	 * @throws NullPointerException
+	 *             Thrown if <code>address</code> is <code>null</code>.
+	 * @throws IllegalArgumentException
+	 *             Thrown if <code>port</code> does not lay in range (0-65535).
 	 */
 	public AbstractDccppSocket(InetAddress address, int port) {
-		this.address = address;
+		this.address = Objects.requireNonNull(address, "address");
+		if (port < 0 || port > 65535) {
+			throw new IllegalArgumentException("port value out of valid range: " + port);
+		}
 		this.port = port;
+	}
+
+	/**
+	 * Constructs a new {@link AbstractDccppSocket} with the specified
+	 * <code>address</code> and <code>port</code>.
+	 * 
+	 * @param address
+	 *            The address.
+	 * @param port
+	 *            The port.
+	 * @param packetFactory
+	 *            The packet factory to use. <code>null</code> to create a new
+	 *            object.
+	 * @throws NullPointerException
+	 *             Thrown if <code>address</code> is <code>null</code>.
+	 * @throws IllegalArgumentException
+	 *             Thrown if <code>port</code> does not lay in range (0-65535).
+	 */
+	public AbstractDccppSocket(InetAddress address, int port,
+			PacketFactory packetFactory) {
+		this.address = Objects.requireNonNull(address, "address");
+		if (port < 0 || port > 65535) {
+			throw new IllegalArgumentException("port value out of valid range: " + port);
+		}
+		this.port = port;
+		this.packetFactory = packetFactory == null ? new PacketFactoryImpl()
+				: packetFactory;
 	}
 
 	@Override
