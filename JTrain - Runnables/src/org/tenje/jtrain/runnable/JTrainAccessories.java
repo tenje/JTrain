@@ -19,8 +19,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.InetAddress;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.MissingFormatArgumentException;
@@ -39,7 +41,6 @@ import org.tenje.jtrain.Turnout;
 import org.tenje.jtrain.dccpp.impl.PacketFactoryImpl;
 import org.tenje.jtrain.dccpp.impl.PacketSensorRegistry;
 import org.tenje.jtrain.dccpp.impl.PacketTurnoutRegistry;
-import org.tenje.jtrain.dccpp.impl.SensorListeningPacketSender;
 import org.tenje.jtrain.dccpp.server.DccppSocket;
 import org.tenje.jtrain.rpi.RPiSensor;
 import org.tenje.jtrain.rpi.RPiSignal;
@@ -50,6 +51,7 @@ import com.pi4j.io.gpio.GpioFactory;
 import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
+import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.RaspiPin;
 
 /**
@@ -101,14 +103,14 @@ public class JTrainAccessories {
 		port = Integer.parseInt(addressParts[1]);
 		// -
 
-		PacketSensorRegistry sensorRegistry = new PacketSensorRegistry();
+		PacketSensorRegistry sensorRegistry = null;
 		PacketTurnoutRegistry turnoutRegistry = new PacketTurnoutRegistry();
-		SensorListeningPacketSender sensorListener = null;
 
 		SAXBuilder builder = new SAXBuilder();
 		Document document = builder.build(new FileInputStream("accessories.xml"));
 		Attribute attribute;
 		AccessoryDecoderAddress accessoryAddress;
+		List<Sensor> sensors = new ArrayList<>();
 		for (Element accessoryElem : document.getRootElement().getChildren()) {
 			if (accessoryElem.getName().equals("lightSignal")) {
 				Map<SignalAspect, GpioPinDigitalOutput> pins = new EnumMap<>(
@@ -161,7 +163,7 @@ public class JTrainAccessories {
 						case "sensor": {
 							Sensor sensor = new RPiSensor(accessoryAddress,
 									getInputPin(accessoryElem, "pin"));
-							sensorRegistry.register(sensor);
+							sensors.add(sensor);
 						}
 						break;
 						case "turnout": {
@@ -198,15 +200,19 @@ public class JTrainAccessories {
 				continue; // Retry
 			}
 			PacketFactoryImpl.regiserDefaultPackets(socket.getPacketFactory());
-			socket.addPacketListener(sensorRegistry);
-			socket.addPacketListener(turnoutRegistry);
-			if (sensorListener == null) {
-				sensorListener = new SensorListeningPacketSender(sensorRegistry, socket,
+			if (sensorRegistry == null) {
+				sensorRegistry = new PacketSensorRegistry(socket,
 						socket.getConnectedBroker());
+				for (Sensor sensor : sensors) {
+					sensorRegistry.register(sensor);
+				}
+				sensors = null;
 			}
 			else {
-				sensorListener.setReceiver(socket.getConnectedBroker());
+				sensorRegistry.setReceiver(socket.getConnectedBroker());
 			}
+			socket.addPacketListener(sensorRegistry);
+			socket.addPacketListener(turnoutRegistry);
 			synchronized (socket) {
 				socket.wait(); // Wait until connection lost
 			}
@@ -220,7 +226,7 @@ public class JTrainAccessories {
 		if ((attribute = elem.getAttribute(name)) != null) {
 			Pin pin = RaspiPin.getPinByAddress(Integer.parseInt(attribute.getValue()));
 			if (pin != null) {
-				return gpio.provisionDigitalInputPin(pin);
+				return gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_DOWN);
 			}
 			else {
 				throw new IllegalArgumentException(
