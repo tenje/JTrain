@@ -56,6 +56,9 @@ public class DccppServerSocket extends AbstractDccppSocket {
 	 * @param port
 	 *            The port number, or 0 to use a port number that is
 	 *            automatically allocated.
+	 * @param packetFactory
+	 *            The packet factory to use. <code>null</code> to create a new
+	 *            object.
 	 * @throws IOException
 	 *             Thrown if an I/O error occurs when opening the socket.
 	 * @throws IllegalArgumentException
@@ -68,8 +71,8 @@ public class DccppServerSocket extends AbstractDccppSocket {
 	 *             doesn't allow the operation.
 	 * @see ServerSocket#ServerSocket(int)
 	 */
-	public DccppServerSocket(int port) throws IOException {
-		super(InetAddress.getLocalHost(), port);
+	public DccppServerSocket(int port, PacketFactory packetFactory) throws IOException {
+		super(InetAddress.getLocalHost(), port, packetFactory);
 		server = new ServerSocket(port);
 		new Thread() {
 			@Override
