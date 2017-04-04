@@ -64,11 +64,7 @@ public abstract class AbstractDccppSocket
 	 *             Thrown if <code>port</code> does not lay in range (0-65535).
 	 */
 	public AbstractDccppSocket(InetAddress address, int port) {
-		this.address = Objects.requireNonNull(address, "address");
-		if (port < 0 || port > 65535) {
-			throw new IllegalArgumentException("port value out of valid range: " + port);
-		}
-		this.port = port;
+		this(address, port, null);
 	}
 
 	/**
