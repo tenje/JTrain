@@ -160,13 +160,13 @@ public class DccppStation implements PacketListener {
 				// TODO Fix
 				receiver.sendPacket(new AbstractPacket('a', Arrays.asList("0")) {},
 						sender);
-				return;
+				return; // Do not redirect
 			}
 			case PacketReadStationState.TYPE_CHAR: {
 				// TODO Send power state (and other status packets?)
 				receiver.sendPacket(new PacketStationInfoImpl("Java DCC++ Base Station"),
 						sender);
-				return;
+				return; // Do not redirect
 			}
 			case PacketTurnout.TYPE_CHAR: {
 				if (receiver == controllerSocket
