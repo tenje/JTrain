@@ -226,7 +226,7 @@ public class JTrainAccessories {
 		if ((attribute = elem.getAttribute(name)) != null) {
 			Pin pin = RaspiPin.getPinByAddress(Integer.parseInt(attribute.getValue()));
 			if (pin != null) {
-				return gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_DOWN);
+				return gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
 			}
 			else {
 				throw new IllegalArgumentException(

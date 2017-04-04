@@ -53,7 +53,7 @@ public class RPiSensor extends AbstractSensor implements GpioPinListenerDigital 
 
 	@Override
 	public boolean isTriggered() {
-		return pin.isHigh();
+		return !pin.isHigh();
 	}
 
 	@Override
