@@ -18,7 +18,6 @@ package org.tenje.jtrain.dccpp.server;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 import org.tenje.jtrain.AccessoryDecoderAddress;
@@ -26,7 +25,6 @@ import org.tenje.jtrain.OutputPinAddress;
 import org.tenje.jtrain.dccpp.LocalPacketBroker;
 import org.tenje.jtrain.dccpp.Packet;
 import org.tenje.jtrain.dccpp.PacketBroker;
-import org.tenje.jtrain.dccpp.PacketBuilder;
 import org.tenje.jtrain.dccpp.PacketFactory;
 import org.tenje.jtrain.dccpp.PacketListener;
 import org.tenje.jtrain.dccpp.PacketOutputPin;
@@ -38,9 +36,8 @@ import org.tenje.jtrain.dccpp.PacketSensorDefine;
 import org.tenje.jtrain.dccpp.PacketTurnout;
 import org.tenje.jtrain.dccpp.PacketTurnoutDefine;
 import org.tenje.jtrain.dccpp.impl.AbstractPacket;
+import org.tenje.jtrain.dccpp.impl.PacketFactoryImpl;
 import org.tenje.jtrain.dccpp.impl.PacketOutputPinDefineImpl;
-import org.tenje.jtrain.dccpp.impl.PacketReadCurrentImpl;
-import org.tenje.jtrain.dccpp.impl.PacketReadStationStateImpl;
 import org.tenje.jtrain.dccpp.impl.PacketSensorDefineImpl;
 import org.tenje.jtrain.dccpp.impl.PacketStationInfoImpl;
 import org.tenje.jtrain.dccpp.impl.PacketTurnoutDefineImpl;
@@ -60,32 +57,8 @@ import org.tenje.jtrain.dccpp.impl.PacketTurnoutDefineImpl;
  */
 public class DccppStation implements PacketListener {
 
-	private static final PacketFactory PACKET_FACTORY = new PacketFactory() {
-
-		@Override // Not required
-		public <P extends Packet> void registerBuilder(PacketBuilder<P> builder,
-				Class<P> clazz, char typeChar) {}
-
-		@Override
-		public Packet buildPacket(final char typeChar, List<String> parameters) {
-			if (typeChar == 'c') {
-				return new PacketReadCurrentImpl();
-			}
-			else if (typeChar == 's') {
-				return new PacketReadStationStateImpl();
-			}
-			return new AbstractPacket(typeChar, parameters) {};
-		}
-
-		@Override // Not required
-		public <P extends Packet> P buildPacket(Class<P> packetClass,
-				List<String> parameters) {
-			return null;
-		}
-	};
-
 	private final DccppServerSocket controllerSocket, accessorySocket;
-
+	private final PacketFactory packetFactory = new PacketFactoryImpl();
 	private final Set<TurnoutEntry> turnuts = new HashSet<>();
 	private final Set<OutputPinEntry> outputPins = new HashSet<>();
 	private final Set<SensorEntry> sensors = new HashSet<>();
@@ -119,14 +92,17 @@ public class DccppStation implements PacketListener {
 			controllerSocket.close();
 			throw ex;
 		}
+		PacketFactoryImpl.regiserDefaultPackets(packetFactory);
 		controllerSocket.addPacketListener(this);
 		accessorySocket.addPacketListener(this);
-		controllerSocket.setPacketFactory(PACKET_FACTORY);
-		accessorySocket.setPacketFactory(PACKET_FACTORY);
+		controllerSocket.setPacketFactory(packetFactory);
+		accessorySocket.setPacketFactory(packetFactory);
 		accessorySocket.addSocketListener(new SocketListener() {
 			@Override
 			public void socketEvent(SocketEvent event) {
+				System.out.println("Con");
 				try {
+					System.out.println(sensors);
 					for (TurnoutEntry entry : turnuts) {
 						accessorySocket.sendPacket(
 								new PacketTurnoutDefineImpl(entry.id, entry.address),
@@ -189,14 +165,15 @@ public class DccppStation implements PacketListener {
 			}
 			break;
 			case PacketSensor.TYPE_CHAR: {
-				if (receiver == controllerSocket
-						&& packet instanceof PacketSensorDefine) {
-					PacketSensorDefine defPacket = (PacketSensorDefine) packet;
-					SensorEntry entry = new SensorEntry();
-					entry.id = defPacket.getId();
-					entry.address = defPacket.getAddress();
-					entry.pullUp = defPacket.usePullUp();
-					sensors.add(entry);
+				if (receiver == controllerSocket) {
+					if (packet instanceof PacketSensorDefine) {
+						PacketSensorDefine defPacket = (PacketSensorDefine) packet;
+						SensorEntry entry = new SensorEntry();
+						entry.id = defPacket.getId();
+						entry.address = defPacket.getAddress();
+						entry.pullUp = defPacket.usePullUp();
+						sensors.add(entry);
+					}
 				}
 			}
 			break;
