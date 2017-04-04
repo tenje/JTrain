@@ -126,12 +126,12 @@ public class DccppServerSocket extends AbstractDccppSocket {
 	}
 
 	/**
-	 * {@inheritDoc} If no connection exists with the <code>receiver</code>'s data,
-	 * then this method will try to open a new socket to the specified
-	 * <code>receiver</code>. Therefore <code>receiver</code> must be an instance of
-	 * {@link SocketPacketBroker}. The <code>receiver</code> must be a server socket
-	 * to accept the connection. This method may also be used to create a new
-	 * connection to an other server socket.
+	 * {@inheritDoc} If no connection exists with the <code>receiver</code>'s
+	 * data, then this method will try to open a new socket to the specified
+	 * <code>receiver</code>. Therefore <code>receiver</code> must be an
+	 * instance of {@link SocketPacketBroker}. The <code>receiver</code> must be
+	 * a server socket to accept the connection. This method may also be used to
+	 * create a new connection to an other server socket.
 	 */
 	@Override
 	public void sendPacket(Packet packet, PacketBroker receiver) throws IOException {
@@ -177,8 +177,8 @@ public class DccppServerSocket extends AbstractDccppSocket {
 	 * 
 	 * @param listener
 	 *            The listener to register.
-	 * @return <code>true</code> if listener was registered, <code>false</code> if
-	 *         listener was already registered.
+	 * @return <code>true</code> if listener was registered, <code>false</code>
+	 *         if listener was already registered.
 	 * @throws NullPointerException
 	 *             Thrown if <code>listener</code> is <code>null</code>.
 	 */
@@ -193,8 +193,8 @@ public class DccppServerSocket extends AbstractDccppSocket {
 	 * 
 	 * @param listener
 	 *            The listener to remove.
-	 * @return <code>true</code> if listener was removed, <code>false</code> if listener
-	 *         was not registered.
+	 * @return <code>true</code> if listener was removed, <code>false</code> if
+	 *         listener was not registered.
 	 * @throws NullPointerException
 	 *             Thrown if <code>listener</code> is <code>null</code>.
 	 */
