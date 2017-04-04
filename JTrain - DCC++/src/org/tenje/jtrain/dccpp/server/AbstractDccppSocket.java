@@ -24,6 +24,7 @@ import java.util.Set;
 
 import org.tenje.jtrain.dccpp.LocalPacketBroker;
 import org.tenje.jtrain.dccpp.Packet;
+import org.tenje.jtrain.dccpp.PacketBroker;
 import org.tenje.jtrain.dccpp.PacketBuilder;
 import org.tenje.jtrain.dccpp.PacketFactory;
 import org.tenje.jtrain.dccpp.PacketListener;
@@ -37,17 +38,21 @@ import org.tenje.jtrain.dccpp.impl.PacketFactoryImpl;
  * 
  * @author Jonas Tennié
  */
-public abstract class AbstractDccppSocket implements AutoCloseable, LocalPacketBroker, SocketPacketBroker {
+public abstract class AbstractDccppSocket
+		implements AutoCloseable, LocalPacketBroker, SocketPacketBroker {
 
 	private final InetAddress address;
 	private final int port;
-	private final Set<PacketListener> listeners = new HashSet<>();
-	private final Set<PacketListener> unmodifiableListeners = Collections.unmodifiableSet(listeners);
+	private final Set<SocketListener> socketListeners = new HashSet<>();
+	private final Set<PacketListener> packetListeners = new HashSet<>();
+	private final Set<PacketListener> unmodifiablePacketListeners = Collections
+			.unmodifiableSet(packetListeners);
 	private PacketFactory packetFactory = new PacketFactoryImpl();
 
 	/**
 	 * Constructs a new {@link AbstractDccppSocket} with the specified
-	 * <code>address</code> and <code>port</code>. No argument validation is made.
+	 * <code>address</code> and <code>port</code>. No argument validation is
+	 * made.
 	 * 
 	 * @param address
 	 *            The address.
@@ -61,7 +66,70 @@ public abstract class AbstractDccppSocket implements AutoCloseable, LocalPacketB
 
 	@Override
 	public void close() throws IOException {
-		listeners.clear();
+		packetListeners.clear();
+	}
+
+	/**
+	 * Fires a {@link SocketEvent} for all registered listeners.
+	 * 
+	 * @param type
+	 *            The event type.
+	 * @param broker
+	 *            The broker. May be <code>null</code> if <code>type</code> is
+	 *            {@link SocketEventType#SOCKET_CLOSE}.
+	 * @throws NullPointerException
+	 *             Thrown if <code>type</code>is <code>null</code> or if
+	 *             <code>broker</code> is <code>null</code>, but type is not
+	 *             <code>SOCKET_CLOSE</code>.
+	 * 
+	 */
+	protected void fireEvent(final SocketEventType type, final PacketBroker broker) {
+		Objects.requireNonNull(type, "type");
+		if (type != SocketEventType.SOCKET_CLOSE) {
+			Objects.requireNonNull(broker, "broker");
+		}
+		SocketEvent event = new SocketEvent() {
+			@Override
+			public SocketEventType getType() {
+				return type;
+			}
+
+			@Override
+			public PacketBroker getBroker() {
+				return broker;
+			}
+		};
+		for (SocketListener listener : socketListeners) {
+			listener.socketEvent(event);
+		}
+	}
+
+	/**
+	 * Registers a socket listener for this server.
+	 * 
+	 * @param listener
+	 *            The listener to register.
+	 * @return <code>true</code> if the listener was registered successfully,
+	 *         <code>false</code> if the listener was already registered.
+	 * @throws NullPointerException
+	 *             Thrown if <code>listener</code> is <code>null</code>.
+	 */
+	public boolean addSocketListener(SocketListener listener) {
+		Objects.requireNonNull(listener, "listener");
+		return socketListeners.add(listener);
+	}
+
+	/**
+	 * Removes a socket listener from this server.
+	 * 
+	 * @param listener
+	 *            The listener to remove. Ignores <code>null</code>-values.
+	 * @return <code>true</code> if the listener was removed, <code>false</code>
+	 *         if the listener was not registered or <code>null</code> was
+	 *         passed.
+	 */
+	public boolean removeSocketListener(SocketListener listener) {
+		return socketListeners.remove(listener);
 	}
 
 	/**
@@ -76,7 +144,7 @@ public abstract class AbstractDccppSocket implements AutoCloseable, LocalPacketB
 	 */
 	public boolean addPacketListener(PacketListener listener) {
 		Objects.requireNonNull(listener, "listener");
-		return listeners.add(listener);
+		return packetListeners.add(listener);
 	}
 
 	/**
@@ -84,11 +152,12 @@ public abstract class AbstractDccppSocket implements AutoCloseable, LocalPacketB
 	 * 
 	 * @param listener
 	 *            The listener to remove. Ignores <code>null</code>-values.
-	 * @return <code>true</code> if the listener was removed, <code>false</code> if the
-	 *         listener was not registered or <code>null</code> was passed.
+	 * @return <code>true</code> if the listener was removed, <code>false</code>
+	 *         if the listener was not registered or <code>null</code> was
+	 *         passed.
 	 */
 	public boolean removePacketListener(PacketListener listener) {
-		return listeners.remove(listener);
+		return packetListeners.remove(listener);
 	}
 
 	/**
@@ -97,7 +166,7 @@ public abstract class AbstractDccppSocket implements AutoCloseable, LocalPacketB
 	 * @return An unmodifiable set containing all registered listeners.
 	 */
 	public Set<PacketListener> getListeners() {
-		return unmodifiableListeners;
+		return unmodifiablePacketListeners;
 	}
 
 	/**
