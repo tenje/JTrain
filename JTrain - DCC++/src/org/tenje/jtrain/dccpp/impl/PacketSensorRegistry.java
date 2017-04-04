@@ -76,8 +76,6 @@ public class PacketSensorRegistry extends AbstractInputRegistry<Sensor>
 			LocalPacketBroker receiver) throws IOException {
 		if (packet instanceof PacketSensor) {
 			if (packet instanceof PacketSensorDefine) {
-				System.out.println("reg " + ((PacketSensorDefine) packet).getId()
-						+ ((PacketSensorDefine) packet).getAddress());
 				getAddressRegistry().defineAddress(((PacketSensorDefine) packet).getId(),
 						((PacketSensorDefine) packet).getAddress());
 				// Always successful
@@ -145,6 +143,7 @@ public class PacketSensorRegistry extends AbstractInputRegistry<Sensor>
 
 	@Override
 	public void sensorStateChanged(Sensor sensor) {
+		System.out.println(sensor.isTriggered());
 		int id = addressRegistry.getId(sensor.getAddress());
 		if (id >= 0) {
 			if (sensor.isTriggered()) {
