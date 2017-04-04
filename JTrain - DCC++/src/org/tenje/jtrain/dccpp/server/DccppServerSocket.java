@@ -51,6 +51,30 @@ public class DccppServerSocket extends AbstractDccppSocket {
 	/**
 	 * Creates a server socket, bound to the specified port. The server's
 	 * {@link PacketFactory} has no registered {@link PacketBuilder}s by
+	 * default. Creates a new {@link PacketFactory} object.
+	 * 
+	 * @param port
+	 *            The port number, or 0 to use a port number that is
+	 *            automatically allocated.
+	 * @throws IOException
+	 *             Thrown if an I/O error occurs when opening the socket.
+	 * @throws IllegalArgumentException
+	 *             Thrown if the port parameter is outside the specified range
+	 *             of valid port values, which is between 0 and 65535,
+	 *             inclusive.
+	 * @throws SecurityException
+	 *             Thrown if a security manager exists and its
+	 *             {@code SecurityManager#checkConnect(String, int)} method
+	 *             doesn't allow the operation.
+	 * @see ServerSocket#ServerSocket(int)
+	 */
+	public DccppServerSocket(int port) throws IOException {
+		this(port, null);
+	}
+
+	/**
+	 * Creates a server socket, bound to the specified port. The server's
+	 * {@link PacketFactory} has no registered {@link PacketBuilder}s by
 	 * default.
 	 * 
 	 * @param port
