@@ -57,7 +57,8 @@ public class RPiSensor extends AbstractSensor implements GpioPinListenerDigital 
 	}
 
 	@Override
-	public void handleGpioPinDigitalStateChangeEvent(GpioPinDigitalStateChangeEvent event) {
+	public void handleGpioPinDigitalStateChangeEvent(
+			GpioPinDigitalStateChangeEvent event) {
 		notifyListeners();
 	}
 
