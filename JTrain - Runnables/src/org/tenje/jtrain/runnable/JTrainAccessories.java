@@ -53,6 +53,7 @@ import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 import com.pi4j.io.gpio.Pin;
 import com.pi4j.io.gpio.PinPullResistance;
+import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 
 /**
@@ -247,7 +248,7 @@ public class JTrainAccessories {
 		if ((attribute = elem.getAttribute(name)) != null) {
 			Pin pin = RaspiPin.getPinByAddress(Integer.parseInt(attribute.getValue()));
 			if (pin != null) {
-				return gpio.provisionDigitalOutputPin(pin);
+				return gpio.provisionDigitalOutputPin(pin, PinState.LOW);
 			}
 			else {
 				throw new IllegalArgumentException(
