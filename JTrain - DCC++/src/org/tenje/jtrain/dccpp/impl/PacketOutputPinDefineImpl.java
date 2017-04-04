@@ -29,7 +29,8 @@ import org.tenje.jtrain.dccpp.PacketOutputPinDefine;
  * 
  * @author Jonas Tennié
  */
-public class PacketOutputPinDefineImpl extends PacketOutputPinImpl implements PacketOutputPinDefine {
+public class PacketOutputPinDefineImpl extends PacketOutputPinImpl
+		implements PacketOutputPinDefine {
 
 	/**
 	 * {@link PacketBuilder} to build a {@link PacketOutputPinDefine}.
@@ -65,10 +66,12 @@ public class PacketOutputPinDefineImpl extends PacketOutputPinImpl implements Pa
 	 * @throws IllegalArgumentException
 	 *             Thrown if <code>id</code> does not lay in range (0-32767).
 	 */
-	public PacketOutputPinDefineImpl(int id, OutputPinAddress address, boolean isInvertedOperation,
-			boolean isResetOnPowerUp, boolean defaultPinState) {
+	public PacketOutputPinDefineImpl(int id, OutputPinAddress address,
+			boolean isInvertedOperation, boolean isResetOnPowerUp,
+			boolean defaultPinState) {
 		super(Arrays.asList(String.valueOf(id), String.valueOf(address.getAddress()),
-				String.valueOf(flagsToInt(isInvertedOperation, isResetOnPowerUp, defaultPinState))));
+				String.valueOf(flagsToInt(isInvertedOperation, isResetOnPowerUp,
+						defaultPinState))));
 		if (id < 0 || id > 32767) {
 			throw new IllegalArgumentException("id value out of valid range: " + id);
 		}
@@ -139,6 +142,11 @@ public class PacketOutputPinDefineImpl extends PacketOutputPinImpl implements Pa
 	@Override
 	public boolean getDefaultPinState() {
 		return defaultPinState;
+	}
+
+	@Override
+	public int getFlag() {
+		return flagsToInt(isInvertedOperation, isResetOnPowerUp, defaultPinState);
 	}
 
 }

@@ -34,7 +34,8 @@ import org.tenje.jtrain.OutputPinAddress;
  * 1&#8793;<code>true</code><br>
  * Flag bit 1: {@link #isResetOnPowerUp()}, 0&#8793;<code>false</code>,
  * 1&#8793;<code>true</code><br>
- * Flag bit 2: {@link #getDefaultPinState()}, 0&#8793;<code>false</code>&#8793;LOW,
+ * Flag bit 2: {@link #getDefaultPinState()},
+ * 0&#8793;<code>false</code>&#8793;LOW,
  * 1&#8793;<code>true</code>&#8793;HIGH</td>
  * </tr>
  * <tr>
@@ -46,7 +47,8 @@ import org.tenje.jtrain.OutputPinAddress;
  * 
  * @author Jonas Tennié
  */
-public interface PacketOutputPinDefine extends Addressable, RegistrationIdHolder, PacketOutputPin {
+public interface PacketOutputPinDefine
+		extends Addressable, RegistrationIdHolder, PacketOutputPin {
 
 	/**
 	 * Returns the output pin number to define.
@@ -61,8 +63,8 @@ public interface PacketOutputPinDefine extends Addressable, RegistrationIdHolder
 	 * ACTIVE&#8793;HIGH / INACTIVE&#8793;LOW) or inverted (<code>true</code>,
 	 * ACTIVE&#8793;LOW / INACTIVE&#8793;HIGH) operation.
 	 * 
-	 * @return <code>true</code> if inverted operation, <code>false</code> if forward
-	 *         operation.
+	 * @return <code>true</code> if inverted operation, <code>false</code> if
+	 *         forward operation.
 	 */
 	boolean isInvertedOperation();
 
@@ -70,8 +72,8 @@ public interface PacketOutputPinDefine extends Addressable, RegistrationIdHolder
 	 * Returns whether the pin state is reset to {@link #getDefaultPinState()}
 	 * or pin state before power-down after power-up.
 	 * 
-	 * @return <code>true</code> if reset after power-up, <code>false</code> if pin state
-	 *         after power-up is restored.
+	 * @return <code>true</code> if reset after power-up, <code>false</code> if
+	 *         pin state after power-up is restored.
 	 */
 	boolean isResetOnPowerUp();
 
@@ -79,9 +81,16 @@ public interface PacketOutputPinDefine extends Addressable, RegistrationIdHolder
 	 * Returns the default state of the pin. The state after power-up or after
 	 * the first initialization.
 	 * 
-	 * @return <code>true</code> if pin is HIGH by default, <code>false</code> if pin is
-	 *         LOW by default.
+	 * @return <code>true</code> if pin is HIGH by default, <code>false</code>
+	 *         if pin is LOW by default.
 	 */
 	boolean getDefaultPinState();
+
+	/**
+	 * Returns the flag value.
+	 * 
+	 * @return The flag value.
+	 */
+	int getFlag();
 
 }
