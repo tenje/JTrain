@@ -91,6 +91,6 @@ public interface PacketOutputPinDefine
 	 * 
 	 * @return The flag value.
 	 */
-	int getFlag();
+	int getFlags();
 
 }

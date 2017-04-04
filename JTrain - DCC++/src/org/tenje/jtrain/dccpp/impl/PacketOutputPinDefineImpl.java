@@ -44,7 +44,7 @@ public class PacketOutputPinDefineImpl extends PacketOutputPinImpl
 
 	private final OutputPinAddress address;
 	private final int id;
-	private final boolean isInvertedOperation, isResetOnPowerUp, defaultPinState;
+	private final int flags;
 
 	/**
 	 * Constructs a new {@link PacketOutputPinDefineImpl} with the specified id,
@@ -77,9 +77,7 @@ public class PacketOutputPinDefineImpl extends PacketOutputPinImpl
 		}
 		this.id = id;
 		this.address = Objects.requireNonNull(address, "address");
-		this.isInvertedOperation = isInvertedOperation;
-		this.isResetOnPowerUp = isResetOnPowerUp;
-		this.defaultPinState = defaultPinState;
+		flags = flagsToInt(isInvertedOperation, isResetOnPowerUp, defaultPinState);
 	}
 
 	private static int flagsToInt(boolean f0, boolean f1, boolean f2) {
@@ -113,10 +111,32 @@ public class PacketOutputPinDefineImpl extends PacketOutputPinImpl
 			throw new IllegalArgumentException("id value out of valid range: " + id);
 		}
 		this.address = new OutputPinAddress(Integer.parseInt(parameters.get(1)));
-		int flags = Integer.parseInt(parameters.get(2));
-		this.isInvertedOperation = (flags & 1) == 1;
-		this.isResetOnPowerUp = (flags >> 1 & 1) == 1;
-		this.defaultPinState = (flags >> 2 & 1) == 1;
+		this.flags = Integer.parseInt(parameters.get(2)) & 0b111;
+	}
+
+	/**
+	 * Constructs a new {@link PacketOutputPinDefineImpl} with the specified id,
+	 * address and flags.
+	 * 
+	 * @param id
+	 *            The ID in range (0-32767).
+	 * @param address
+	 *            The pin address.
+	 * @param flags
+	 *            The flags. Bit 0 is {@link #isInvertedOperation()}, bit 1 is
+	 *            {@link #isResetOnPowerUp()} and bit 2 is
+	 *            {@link #getDefaultPinState()}.
+	 */
+	public PacketOutputPinDefineImpl(int id, OutputPinAddress address, int flags) {
+		super(Arrays.asList(String.valueOf(id), String.valueOf(address.getAddress()),
+				String.valueOf(flagsToInt((flags & 1) == 1, (flags >> 1 & 1) == 1,
+						(flags >> 2 & 1) == 1))));
+		if (id < 0 || id > 32767) {
+			throw new IllegalArgumentException("id value out of valid range: " + id);
+		}
+		this.id = id;
+		this.address = Objects.requireNonNull(address, "address");
+		this.flags = flags & 0b111;
 	}
 
 	@Override
@@ -131,22 +151,22 @@ public class PacketOutputPinDefineImpl extends PacketOutputPinImpl
 
 	@Override
 	public boolean isInvertedOperation() {
-		return isInvertedOperation;
+		return (flags & 1) == 1;
 	}
 
 	@Override
 	public boolean isResetOnPowerUp() {
-		return isResetOnPowerUp;
+		return (flags >> 1 & 1) == 1;
 	}
 
 	@Override
 	public boolean getDefaultPinState() {
-		return defaultPinState;
+		return (flags >> 2 & 1) == 1;
 	}
 
 	@Override
-	public int getFlag() {
-		return flagsToInt(isInvertedOperation, isResetOnPowerUp, defaultPinState);
+	public int getFlags() {
+		return flags;
 	}
 
 }
