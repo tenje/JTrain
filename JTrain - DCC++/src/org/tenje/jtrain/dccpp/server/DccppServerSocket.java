@@ -21,7 +21,6 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
@@ -48,9 +47,6 @@ public class DccppServerSocket extends AbstractDccppSocket {
 	private final Map<Socket, PacketOutputStream> socketOuts = new HashMap<>();
 	private final Set<SocketPacketBroker> unmodifiableBrokers = Collections
 			.unmodifiableSet(socketsByBroker.keySet());
-	private final Set<DccppServerSocketListener> serverSocketListeners = new HashSet<>();
-	private final Set<DccppServerSocketListener> unmodifiableServerSocketListeners = Collections
-			.unmodifiableSet(serverSocketListeners);
 
 	/**
 	 * Creates a server socket, bound to the specified port. The server's
@@ -105,12 +101,9 @@ public class DccppServerSocket extends AbstractDccppSocket {
 		}
 		socketsByBroker.put(connectedBroker, socket);
 		socketOuts.put(socket, new PacketOutputStream(socket.getOutputStream()));
+		fireEvent(SocketEventType.BROKER_CONNECT, connectedBroker);
 		new DccppListeningThread(this, connectedBroker, socket.getInputStream(), null)
 				.start();
-		for (DccppServerSocketListener listener : serverSocketListeners) {
-			listener.connectionAccepted(connectedBroker, this);
-		}
-		fireEvent(SocketEventType.BROKER_CONNECT, connectedBroker);
 	}
 
 	/**
@@ -172,49 +165,6 @@ public class DccppServerSocket extends AbstractDccppSocket {
 	 */
 	public Set<SocketPacketBroker> getConnectedBrokers() {
 		return unmodifiableBrokers;
-	}
-
-	/**
-	 * Registers a {@link DccppServerSocketListener} for this server socket.
-	 * 
-	 * @param listener
-	 *            The listener to register.
-	 * @return <code>true</code> if listener was registered, <code>false</code>
-	 *         if listener was already registered.
-	 * @throws NullPointerException
-	 *             Thrown if <code>listener</code> is <code>null</code>.
-	 */
-	public boolean registerServerSocketListener(DccppServerSocketListener listener) {
-		Objects.requireNonNull(listener, "listener");
-		return serverSocketListeners.add(listener);
-	}
-
-	/**
-	 * Removes a registered {@link DccppServerSocketListener} for this server
-	 * socket.
-	 * 
-	 * @param listener
-	 *            The listener to remove.
-	 * @return <code>true</code> if listener was removed, <code>false</code> if
-	 *         listener was not registered.
-	 * @throws NullPointerException
-	 *             Thrown if <code>listener</code> is <code>null</code>.
-	 */
-	public boolean removeServerSocketListener(DccppServerSocketListener listener) {
-		Objects.requireNonNull(listener, "listener");
-		return serverSocketListeners.remove(listener);
-	}
-
-	/**
-	 * Returns an unmodifiable {@link Set} containing all registered
-	 * {@link DccppServerSocketListener}. The set always represents the
-	 * currently registered listeners.
-	 * 
-	 * @return An unmodifiable set containing all registered server socket
-	 *         listeners.
-	 */
-	public Set<DccppServerSocketListener> getServerSocketListeners() {
-		return unmodifiableServerSocketListeners;
 	}
 
 }
