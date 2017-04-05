@@ -207,12 +207,18 @@ public class DccppStation implements PacketListener {
 		}
 		if (receiver == controllerSocket) {
 			for (PacketBroker accessoryBroker : accessorySocket.getConnectedBrokers()) {
-				accessorySocket.sendPacket(packet, accessoryBroker);
+				try {
+					accessorySocket.sendPacket(packet, accessoryBroker);
+				}
+				catch (IOException ex) {}
 			}
 		}
 		else if (receiver == accessorySocket) {
 			for (PacketBroker controllerBroker : controllerSocket.getConnectedBrokers()) {
-				controllerSocket.sendPacket(packet, controllerBroker);
+				try {
+					controllerSocket.sendPacket(packet, controllerBroker);
+				}
+				catch (IOException ex) {}
 			}
 		}
 	}
