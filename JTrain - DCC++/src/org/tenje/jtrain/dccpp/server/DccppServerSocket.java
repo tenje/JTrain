@@ -158,28 +158,31 @@ public class DccppServerSocket extends AbstractDccppSocket {
 	public void sendPacket(Packet packet, PacketBroker receiver) throws IOException {
 		Objects.requireNonNull(packet, "packet");
 		Objects.requireNonNull(receiver, "receiver");
-		Socket socket = socketsByBroker.get(receiver);
-		if (socket == null || socket.isClosed()) { // No such socket
-			SocketPacketBroker socketReceiver = (SocketPacketBroker) receiver;
-			// Throws ClassCastException if receiver is no SocketPacketBroker
-			socket = new Socket(socketReceiver.getInetAddress(),
-					socketReceiver.getPort());
-			handleSocket(socket, socketReceiver);
-		}
-		PacketOutputStream out = socketOuts.get(socket);
-		try {
-			out.writePacket(packet);
-		}
-		catch (IOException ex) {
-			try {
-				socket.close();
+		synchronized (receiver) {
+			Socket socket = socketsByBroker.get(receiver);
+			if (socket == null || socket.isClosed()) { // No such socket
+				SocketPacketBroker socketReceiver = (SocketPacketBroker) receiver;
+				// Throws ClassCastException if receiver is no
+				// SocketPacketBroker
+				socket = new Socket(socketReceiver.getInetAddress(),
+						socketReceiver.getPort());
+				handleSocket(socket, socketReceiver);
 			}
-			// Ignore. Only thrown if data to send still in socket buffer
-			catch (IOException ex2) {}
-			socketsByBroker.remove(receiver);
-			socketOuts.remove(socket);
-			fireEvent(SocketEventType.BROKER_DISCONNECT, receiver);
-			throw ex;
+			PacketOutputStream out = socketOuts.get(socket);
+			try {
+				out.writePacket(packet);
+			}
+			catch (IOException ex) {
+				try {
+					socket.close();
+				}
+				// Ignore. Only thrown if data to send still in socket buffer
+				catch (IOException ex2) {}
+				socketsByBroker.remove(receiver);
+				socketOuts.remove(socket);
+				fireEvent(SocketEventType.BROKER_DISCONNECT, receiver);
+				throw ex;
+			}
 		}
 	}
 
