@@ -73,6 +73,7 @@ public class RPiTurnout extends AbstractSwitchable implements Turnout {
 
 	@Override
 	public void setSwitched(boolean switched) {
+		this.switched = switched;
 		if (currentTask != null) {
 			currentTask.cancel();
 		}
