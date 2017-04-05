@@ -152,7 +152,9 @@ public class DccppServerSocket extends AbstractDccppSocket {
 	 * <code>receiver</code>. Therefore <code>receiver</code> must be an
 	 * instance of {@link SocketPacketBroker}. The <code>receiver</code> must be
 	 * a server socket to accept the connection. This method may also be used to
-	 * create a new connection to an other server socket.
+	 * create a new connection to an other server socket.<br />
+	 * If an {@link IOException} occurs while sending the data, then the
+	 * connection will be closed. An the exception will be re-thrown.
 	 */
 	@Override
 	public void sendPacket(Packet packet, PacketBroker receiver) throws IOException {
