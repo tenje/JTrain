@@ -191,7 +191,7 @@ public class JTrainAccessories {
 							}
 							else {
 								throw new MissingFormatArgumentException(
-										"no straightPwm defined: " + accessoryElem);
+										"no pin defined: " + accessoryElem);
 							}
 							if ((attribute = accessoryElem
 									.getAttribute("straightPwm")) != null) {
