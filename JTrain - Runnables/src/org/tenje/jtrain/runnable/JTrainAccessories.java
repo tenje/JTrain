@@ -44,6 +44,7 @@ import org.tenje.jtrain.dccpp.impl.PacketSensorRegistry;
 import org.tenje.jtrain.dccpp.impl.PacketTurnoutRegistry;
 import org.tenje.jtrain.dccpp.server.DccppSocket;
 import org.tenje.jtrain.rpi.RPiSensor;
+import org.tenje.jtrain.rpi.RPiServoTurnout;
 import org.tenje.jtrain.rpi.RPiSignal;
 import org.tenje.jtrain.rpi.RPiTurnout;
 
@@ -179,6 +180,41 @@ public class JTrainAccessories {
 							Turnout turnout = new RPiTurnout(accessoryAddress,
 									getOutputPin(accessoryElem, "straightPin"),
 									getOutputPin(accessoryElem, "thrownPin"), switchTime);
+							turnoutRegistry.register(turnout);
+						}
+						break;
+						case "servoTurnout": {
+							int pin, switchTime = 0;
+							double straightTime, thrownTime;
+							if ((attribute = accessoryElem.getAttribute("pin")) != null) {
+								pin = Integer.parseInt(attribute.getValue());
+							}
+							else {
+								throw new MissingFormatArgumentException(
+										"no straightPwm defined: " + accessoryElem);
+							}
+							if ((attribute = accessoryElem
+									.getAttribute("straightPwm")) != null) {
+								straightTime = Double.parseDouble(attribute.getValue());
+							}
+							else {
+								throw new MissingFormatArgumentException(
+										"no straightPwm defined: " + accessoryElem);
+							}
+							if ((attribute = accessoryElem
+									.getAttribute("thrownPwm")) != null) {
+								thrownTime = Double.parseDouble(attribute.getValue());
+							}
+							else {
+								throw new MissingFormatArgumentException(
+										"no thrownPwm defined: " + accessoryElem);
+							}
+							if ((attribute = accessoryElem
+									.getAttribute("switchTime")) != null) {
+								switchTime = Integer.parseInt(attribute.getValue());
+							}
+							Turnout turnout = new RPiServoTurnout(accessoryAddress, pin,
+									straightTime, thrownTime, switchTime);
 							turnoutRegistry.register(turnout);
 						}
 						break;
