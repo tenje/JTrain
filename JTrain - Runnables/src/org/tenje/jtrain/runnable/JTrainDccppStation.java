@@ -51,6 +51,7 @@ public class JTrainDccppStation {
 		}
 	}
 
+	@SuppressWarnings("resource")
 	private static void start(String[] args) throws IOException {
 		if (args.length < 2) {
 			throw new IllegalArgumentException("no ports defined");
