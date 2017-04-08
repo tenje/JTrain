@@ -141,7 +141,7 @@ public class DccppStation implements AutoCloseable, PacketListener {
 	}
 
 	@Override
-	public void close() throws Exception {
+	public void close() throws IOException {
 		controllerSocket.close();
 		accessorySocket.close();
 	}
