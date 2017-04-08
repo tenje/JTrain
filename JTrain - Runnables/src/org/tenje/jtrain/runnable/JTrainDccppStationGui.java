@@ -99,6 +99,7 @@ public class JTrainDccppStationGui {
 					catch (IOException ex) {
 						ex.printStackTrace();
 					}
+					station = null;
 					startStopButton.setText("Start");
 				}
 				startStopButton.setEnabled(true);
