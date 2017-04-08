@@ -50,7 +50,7 @@ import org.tenje.jtrain.dccpp.impl.PacketStationInfoImpl;
  * 
  * @author Jonas Tennié
  */
-public class DccppStation implements PacketListener {
+public class DccppStation implements AutoCloseable, PacketListener {
 
 	private final DccppServerSocket controllerSocket, accessorySocket;
 	private final Map<Integer, PacketTurnoutDefine> turnuts = new TreeMap<>();
@@ -138,6 +138,12 @@ public class DccppStation implements PacketListener {
 				catch (IOException ex) {}
 			}
 		});
+	}
+
+	@Override
+	public void close() throws Exception {
+		controllerSocket.close();
+		accessorySocket.close();
 	}
 
 	@Override
