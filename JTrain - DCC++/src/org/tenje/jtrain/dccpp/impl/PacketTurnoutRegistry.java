@@ -17,6 +17,7 @@ package org.tenje.jtrain.dccpp.impl;
 
 import java.io.IOException;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import org.tenje.jtrain.AbstractOutputRegistry;
 import org.tenje.jtrain.AccessoryDecoderAddress;
@@ -35,8 +36,6 @@ import org.tenje.jtrain.dccpp.PacketTurnoutDefine;
 import org.tenje.jtrain.dccpp.PacketTurnoutDelete;
 import org.tenje.jtrain.dccpp.PacketTurnoutList;
 import org.tenje.jtrain.dccpp.PacketTurnoutThrow;
-
-import java.util.Set;
 
 /**
  * An {@link OutputRegistry} and {@link PacketListeningRegistry} for

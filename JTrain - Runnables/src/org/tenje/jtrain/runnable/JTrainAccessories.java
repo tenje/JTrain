@@ -37,12 +37,15 @@ import org.tenje.jtrain.Sensor;
 import org.tenje.jtrain.Signal;
 import org.tenje.jtrain.SignalAspect;
 import org.tenje.jtrain.SignalAspectControlTurnout;
+import org.tenje.jtrain.SwitchableScheduler;
+import org.tenje.jtrain.SwitchableSchedulerBuilder;
 import org.tenje.jtrain.Turnout;
 import org.tenje.jtrain.dccpp.PacketFactory;
 import org.tenje.jtrain.dccpp.impl.PacketFactoryImpl;
 import org.tenje.jtrain.dccpp.impl.PacketSensorRegistry;
 import org.tenje.jtrain.dccpp.impl.PacketTurnoutRegistry;
 import org.tenje.jtrain.dccpp.server.DccppSocket;
+import org.tenje.jtrain.rpi.RPiOutputPin;
 import org.tenje.jtrain.rpi.RPiSensor;
 import org.tenje.jtrain.rpi.RPiServoTurnout;
 import org.tenje.jtrain.rpi.RPiSignal;
@@ -159,6 +162,15 @@ public class JTrainAccessories {
 								entry.getKey(), signal, entry.getValue()));
 					}
 				}
+			}
+			else if (accessoryElem.getName().equals("scheduler")) {
+				SwitchableScheduler scheduler = getScheduler(accessoryElem);
+				if ((attribute = accessoryElem.getAttribute("address")) != null) {
+					accessoryAddress = new AccessoryDecoderAddress(
+							Integer.parseInt(attribute.getValue()), 0);
+					throw new UnsupportedOperationException("Not supported, yet");
+				}
+				scheduler.setSwitched(true);
 			}
 			else {
 				if ((attribute = accessoryElem.getAttribute("address")) != null) {
@@ -295,6 +307,60 @@ public class JTrainAccessories {
 			throw new MissingFormatArgumentException(
 					"pin attribute missing for " + elem + ": " + name);
 		}
+	}
+
+	private static SwitchableScheduler getScheduler(Element elem) {
+		SwitchableSchedulerBuilder builder = new SwitchableSchedulerBuilder();
+		Attribute attribute;
+		boolean loop = true;
+		if ((attribute = elem.getAttribute("loop")) != null) {
+			String attributeValue = attribute.getValue().toLowerCase();
+			if (attributeValue.equals("false")) {
+				loop = false;
+			}
+			else if (!attributeValue.equals("true")) {
+				throw new IllegalArgumentException(
+						"state argument: " + attribute.getValue());
+			}
+		}
+		for (Element child : elem.getChildren()) {
+			switch (child.getName()) {
+				case "pinState": {
+					GpioPinDigitalOutput pin = getOutputPin(child, "pin");
+					boolean state;
+					attribute = child.getAttribute("state");
+					if (attribute == null) {
+						throw new MissingFormatArgumentException(
+								"no state defined: " + child);
+					}
+					String attributeValue = attribute.getValue().toLowerCase();
+					if (attributeValue.equals("high")) {
+						state = true;
+					}
+					else if (attributeValue.equals("low")) {
+						state = false;
+					}
+					else {
+						throw new IllegalArgumentException(
+								"state argument: " + attribute.getValue());
+					}
+					builder.setState(new RPiOutputPin(pin), state);
+				}
+				break;
+				case "sleep": {
+					if ((attribute = elem.getAttribute("time")) != null) {
+						long time = Long.parseLong(attribute.getValue());
+						builder.sleep(time);
+					}
+					else {
+						throw new MissingFormatArgumentException(
+								"no thrownPwm defined: " + child);
+					}
+				}
+				break;
+			}
+		}
+		return builder.build(loop);
 	}
 
 }
