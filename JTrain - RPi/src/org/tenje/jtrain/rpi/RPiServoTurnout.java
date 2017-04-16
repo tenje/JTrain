@@ -33,6 +33,7 @@ public class RPiServoTurnout extends AbstractSwitchable implements Turnout {
 
 	private static final Timer TIMER = new Timer();
 
+	private final Object synchronizer = new Object();
 	private final AccessoryDecoderAddress address;
 	private final int pin, straightTime, thrownTime;
 	private final long switchTime;
@@ -89,30 +90,35 @@ public class RPiServoTurnout extends AbstractSwitchable implements Turnout {
 	@Override
 	public void setSwitched(boolean switched) {
 		final Runtime runtime = Runtime.getRuntime();
-		this.switched = switched;
-		if (currentTask != null) {
-			currentTask.cancel();
-		}
-		try {
-			runtime.exec("gpio mode " + pin + " pwm");
-			runtime.exec("gpio pwm-ms");
-			runtime.exec("gpio pwmc 192");
-			runtime.exec("gpio pwmr 2000");
-			runtime.exec("gpio pwm 1 " + (switched ? thrownTime : straightTime));
-		}
-		catch (IOException ex) {}
-		if (switchTime != 0) {
-			currentTask = new TimerTask() {
-				@Override
-				public void run() {
-					try {
-						runtime.exec("gpio mode " + pin + " out");
-						runtime.exec("gpio write " + pin + " 0");
+		synchronized (synchronizer) {
+			this.switched = switched;
+			if (currentTask != null) {
+				currentTask.cancel();
+			}
+			try {
+				runtime.exec("gpio mode " + pin + " pwm");
+				runtime.exec("gpio pwm-ms");
+				runtime.exec("gpio pwmc 192");
+				runtime.exec("gpio pwmr 2000");
+				runtime.exec("gpio pwm 1 " + (switched ? thrownTime : straightTime));
+			}
+			catch (IOException ex) {}
+			if (switchTime != 0) {
+				currentTask = new TimerTask() {
+					@Override
+					public void run() {
+						try {
+							synchronized (synchronizer) {
+								runtime.exec("gpio mode " + pin + " out");
+								runtime.exec("gpio write " + pin + " 0");
+							}
+						}
+						catch (IOException e) {}
+						currentTask = null;
 					}
-					catch (IOException e) {}
-				}
-			};
-			TIMER.schedule(currentTask, switchTime);
+				};
+				TIMER.schedule(currentTask, switchTime);
+			}
 		}
 	}
 
