@@ -16,11 +16,14 @@
 package org.tenje.jtrain.runnable;
 
 import java.io.IOException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.logging.FileHandler;
 import java.util.logging.Formatter;
 import java.util.logging.Handler;
+import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 import java.util.logging.StreamHandler;
 
 /**
@@ -31,6 +34,9 @@ import java.util.logging.StreamHandler;
  * @author Jonas Tennié
  */
 public class JTrainLogger extends Logger {
+
+	private static final DateFormat DATE_FORMAT = new SimpleDateFormat(
+			"MMM d yyyy, hh:mm a");
 
 	/**
 	 * Constructs a new {@link JTrainLogger} with the specified name.
@@ -45,8 +51,14 @@ public class JTrainLogger extends Logger {
 	 */
 	public JTrainLogger(String name) throws SecurityException, IOException {
 		super(name, null);
-		Formatter formatter = new SimpleFormatter();
-		Handler handler = new FileHandler(name + ".log.txt");
+		Formatter formatter = new Formatter() {
+			@Override
+			public String format(LogRecord record) {
+				return DATE_FORMAT.format(new Date()) + ", " + record.getLevel() + ": "
+						+ record.getMessage() + "\r\n";
+			}
+		};
+		Handler handler = new FileHandler(name + ".log.txt", true);
 		handler.setFormatter(formatter);
 		addHandler(handler);
 		handler = new StreamHandler(System.out, formatter);
