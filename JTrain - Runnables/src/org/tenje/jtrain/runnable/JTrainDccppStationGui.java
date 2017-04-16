@@ -111,6 +111,10 @@ public class JTrainDccppStationGui {
 		logArea.setWrapStyleWord(true);
 		logArea.setFont(new Font(logArea.getFont().getFontName(),
 				logArea.getFont().getStyle(), 18));
+		final JScrollPane logPane = new JScrollPane(logArea);
+		logPane.setBorder(new TitledBorder(new EtchedBorder(), "Log"));
+		logPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+
 		PrintStream logStream = new PrintStream(new OutputStream() {
 			private final StringBuilder sb = new StringBuilder();
 
@@ -122,6 +126,8 @@ public class JTrainDccppStationGui {
 				if (b == '\n') {
 					String text = sb.toString() + "\n";
 					logArea.append(text);
+					logPane.getVerticalScrollBar()
+							.setValue(logPane.getVerticalScrollBar().getMaximum());
 					sb.setLength(0);
 				}
 				else {
@@ -131,9 +137,6 @@ public class JTrainDccppStationGui {
 		}, true);
 		System.setOut(logStream);
 		System.setErr(logStream);
-		final JScrollPane logPane = new JScrollPane(logArea);
-		logPane.setBorder(new TitledBorder(new EtchedBorder(), "Log"));
-		logPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
 		controllerPortLabel.setBounds(10, 10, 150, 25);
 		frame.add(controllerPortLabel);
