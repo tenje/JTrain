@@ -26,6 +26,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.MissingFormatArgumentException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.jdom2.Attribute;
 import org.jdom2.Document;
@@ -73,27 +75,24 @@ public class JTrainAccessories {
 	 * @param args
 	 *            The arguments containing the station host address in the first
 	 *            (0) index with format <code>address:port</code>.
+	 * @throws SecurityException
+	 *             Thrown if a security manager exists and if the caller does
+	 *             not have LoggingPermission("control").
+	 * @throws IOException
+	 *             Thrown if an I/O error occurs when opening the output file.
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SecurityException, IOException {
+		Logger logger = new JTrainLogger("Accessory Decoder");
 		try {
-			start(args);
+			start(args, logger);
 		}
 		catch (Throwable t) {
-			System.err.print("Failed to start program: ");
-			if (t.getMessage() != null) {
-				System.err.println(t.getMessage());
-			}
-			else {
-				System.err.println(t.getClass().getName());
-			}
-			System.err.println();
-			System.err.println("Developer info:");
-			t.printStackTrace();
+			logger.log(Level.SEVERE, "Failed to start program:", t);
 		}
 	}
 
-	private static void start(String[] args) throws FileNotFoundException, JDOMException,
-			IOException, InterruptedException {
+	private static void start(String[] args, Logger logger) throws FileNotFoundException,
+			JDOMException, IOException, InterruptedException {
 		DccppSocket socket;
 		String[] addressParts;
 		InetAddress address;
@@ -240,15 +239,15 @@ public class JTrainAccessories {
 		}
 
 		// --
-		System.out.println("Connecting to " + address + ":" + port + "...");
+		logger.info("Connecting to " + address + ":" + port + "...");
 		while (true) {
 			try {
 				socket = new DccppSocket(address, port, packetFactory);
-				System.out.println("Connected");
+				logger.info("Connected");
 			}
 			catch (IOException ex) {
 				Thread.sleep(1_000);
-				System.err.println("Connection failed. Retrying...");
+				logger.log(Level.WARNING, "Connection failed. Retrying...");
 				continue; // Retry
 			}
 			if (sensorRegistry == null) {
@@ -267,7 +266,7 @@ public class JTrainAccessories {
 			synchronized (socket) {
 				socket.wait(); // Wait until connection lost
 			}
-			System.err.println("Connection lost. Trying to reconnect...");
+			logger.log(Level.WARNING, "Connection lost. Trying to reconnect...");
 		}
 	}
 
