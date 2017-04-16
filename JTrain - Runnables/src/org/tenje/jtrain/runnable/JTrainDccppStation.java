@@ -16,6 +16,8 @@
 package org.tenje.jtrain.runnable;
 
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import org.tenje.jtrain.dccpp.server.DccppStation;
 
@@ -32,36 +34,33 @@ public class JTrainDccppStation {
 	 * 
 	 * @param args
 	 *            The arguments containing the two port numbers.
+	 * @throws SecurityException
+	 *             Thrown if a security manager exists and if the caller does
+	 *             not have LoggingPermission("control").
+	 * @throws IOException
+	 *             Thrown if an I/O error occurs when opening the output file.
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SecurityException, IOException {
+		Logger logger = new JTrainLogger("DCC++ Station");
 		try {
-			start(args);
+			start(args, logger);
 		}
 		catch (Throwable t) {
-			System.err.print("Failed to start program: ");
-			if (t.getMessage() != null) {
-				System.err.println(t.getMessage());
-			}
-			else {
-				System.err.println(t.getClass().getName());
-			}
-			System.err.println();
-			System.err.println("Developer info:");
-			t.printStackTrace();
+			logger.log(Level.SEVERE, "Failed to start program:", t);
 		}
 	}
 
 	@SuppressWarnings("resource")
-	private static void start(String[] args) throws IOException {
+	private static void start(String[] args, Logger logger) throws IOException {
 		if (args.length < 2) {
 			throw new IllegalArgumentException("no ports defined");
 		}
 		int controllerPort = Integer.parseInt(args[0]);
 		int accessoryPort = Integer.parseInt(args[1]);
-		System.out.println("Starting station on controller port " + args[0]
+		logger.info("Starting station on controller port " + args[0]
 				+ " and accessory port " + args[1] + "...");
 		new DccppStation(controllerPort, accessoryPort);
-		System.out.println("Started");
+		logger.info("Started");
 	}
 
 }
