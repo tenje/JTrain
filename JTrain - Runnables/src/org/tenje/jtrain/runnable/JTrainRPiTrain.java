@@ -24,6 +24,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.MissingFormatArgumentException;
 import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.Clip;
@@ -75,28 +77,26 @@ public class JTrainRPiTrain {
 	 * @param args
 	 *            The arguments containing the station host address in the first
 	 *            (0) index with format <code>address:port</code>.
+	 * @throws SecurityException
+	 *             Thrown if a security manager exists and if the caller does
+	 *             not have LoggingPermission("control").
+	 * @throws IOException
+	 *             Thrown if an I/O error occurs when opening the output file.
 	 */
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SecurityException, IOException {
+		Logger logger = new JTrainLogger("Train Decoder");
 		try {
-			start(args);
+			start(args, logger);
 		}
 		catch (Throwable t) {
-			System.err.print("Failed to start program: ");
-			if (t.getMessage() != null) {
-				System.err.println(t.getMessage());
-			}
-			else {
-				System.err.println(t.getClass().getName());
-			}
-			System.err.println();
-			System.err.println("Developer info:");
-			t.printStackTrace();
+			logger.log(Level.SEVERE, "Failed to start program:", t);
 		}
 	}
 
 	@SuppressWarnings("resource")
-	private static void start(String[] args) throws LineUnavailableException, IOException,
-			UnsupportedAudioFileException, JDOMException, InterruptedException {
+	private static void start(String[] args, Logger logger)
+			throws LineUnavailableException, IOException, UnsupportedAudioFileException,
+			JDOMException, InterruptedException {
 		PacketFactory packetFactory = new PacketFactoryImpl();
 		PacketFactoryImpl.regiserDefaultPackets(packetFactory);
 		DccppSocket socket;
@@ -114,15 +114,15 @@ public class JTrainRPiTrain {
 		port = Integer.parseInt(addressParts[1]);
 		Train train = buildTrain();
 		PacketListener trainListener = new PacketListeningTrainController(train);
-		System.out.println("Connecting to " + address + ":" + port + "...");
+		logger.info("Connecting to " + address + ":" + port + "...");
 		while (true) {
 			try {
 				socket = new DccppSocket(address, port);
-				System.out.println("Connected");
+				logger.info("Connected");
 			}
 			catch (IOException ex) {
 				Thread.sleep(1_000);
-				System.err.println("Connection failed. Retrying...");
+				logger.log(Level.WARNING, "Connection failed. Retrying...");
 				continue; // Retry
 			}
 			PacketFactoryImpl.regiserDefaultPackets(socket.getPacketFactory());
@@ -130,7 +130,7 @@ public class JTrainRPiTrain {
 			synchronized (socket) {
 				socket.wait(); // Wait until connection lost
 			}
-			System.err.println("Connection lost. Trying to reconnect...");
+			logger.log(Level.WARNING, "Connection lost. Trying to reconnect...");
 		}
 	}
 
