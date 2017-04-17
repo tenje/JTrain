@@ -17,6 +17,7 @@ package org.tenje.jtrain.runnable;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -82,7 +83,8 @@ public class JTrainAccessories {
 	 *             Thrown if an I/O error occurs when opening the output file.
 	 */
 	public static void main(String[] args) throws SecurityException, IOException {
-		Logger logger = new JTrainLogger("Accessory Decoder");
+		Logger logger = new JTrainLogger("Accessory Decoder", System.out,
+				new FileOutputStream("accessories.log.txt"));
 		try {
 			start(args, logger);
 		}

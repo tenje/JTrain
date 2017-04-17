@@ -17,6 +17,7 @@ package org.tenje.jtrain.runnable;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.util.ArrayList;
@@ -84,7 +85,8 @@ public class JTrainRPiTrain {
 	 *             Thrown if an I/O error occurs when opening the output file.
 	 */
 	public static void main(String[] args) throws SecurityException, IOException {
-		Logger logger = new JTrainLogger("Train Decoder");
+		Logger logger = new JTrainLogger("Train Decoder", System.out,
+				new FileOutputStream("train.log.txt"));
 		try {
 			start(args, logger);
 		}

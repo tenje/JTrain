@@ -15,6 +15,7 @@
  *******************************************************************************/
 package org.tenje.jtrain.runnable;
 
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -41,7 +42,8 @@ public class JTrainDccppStation {
 	 *             Thrown if an I/O error occurs when opening the output file.
 	 */
 	public static void main(String[] args) throws SecurityException, IOException {
-		Logger logger = new JTrainLogger("DCC++ Station");
+		Logger logger = new JTrainLogger("DCC++ Station", System.out,
+				new FileOutputStream("dccpp_station.log.txt"));
 		try {
 			start(args, logger);
 		}

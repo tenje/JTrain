@@ -16,13 +16,14 @@
 package org.tenje.jtrain.runnable;
 
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.util.Date;
 import java.util.logging.FileHandler;
-import java.util.logging.Formatter;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
-import java.util.logging.StreamHandler;
 
 /**
  * A {@link Logger} used for the JTrain runnables. Two default {@link Handler}s
@@ -33,31 +34,66 @@ import java.util.logging.StreamHandler;
  */
 public class JTrainLogger extends Logger {
 
+	private static final Formatter FORMATTER = new Formatter();
+
 	/**
 	 * Constructs a new {@link JTrainLogger} with the specified name.
 	 * 
 	 * @param name
 	 *            The name of the logger.
+	 * @param logStreams
+	 *            An array containing all streams to write the log to.
 	 * @throws SecurityException
 	 *             Thrown if a security manager exists and if the caller does
 	 *             not have LoggingPermission("control").
 	 * @throws IOException
 	 *             Thrown if an I/O error occurs when opening the output file.
 	 */
-	public JTrainLogger(String name) throws SecurityException, IOException {
+	public JTrainLogger(String name, OutputStream... logStreams)
+			throws SecurityException, IOException {
 		super(name, null);
-		Formatter formatter = new SimpleFormatter();
-		Handler handler = new FileHandler(name + ".log.txt", true);
-		handler.setFormatter(formatter);
-		addHandler(handler);
-		handler = new StreamHandler(System.out, formatter) {
-			@Override
-			public synchronized void publish(final LogRecord record) {
-				super.publish(record);
-				flush();
+		for (OutputStream out : logStreams) {
+			addHandler(new StreamHandler(out, FORMATTER));
+		}
+	}
+
+	private static class Formatter extends java.util.logging.Formatter {
+
+		// Static as only one Formatter instance exists
+		private final String FORMAT = "[%1$tb %1$te %1$tY, %1$tH:%1$tM:%1$tS, %2$s]: %3$s %4$s\r\n";
+		private final Date DATE = new Date();
+
+		@Override
+		public String format(LogRecord record) {
+			DATE.setTime(record.getMillis());
+			String message = formatMessage(record);
+			String throwable = "";
+			if (record.getThrown() != null) {
+				StringWriter sw = new StringWriter();
+				PrintWriter pw = new PrintWriter(sw);
+				pw.println();
+				record.getThrown().printStackTrace(pw);
+				pw.close();
+				throwable = sw.toString();
 			}
-		};
-		addHandler(handler);
+			return String.format(FORMAT, DATE, record.getLevel().getLocalizedName(),
+					message, throwable);
+		}
+
+	}
+
+	private static class StreamHandler extends java.util.logging.StreamHandler {
+
+		public StreamHandler(OutputStream out, Formatter formatter) {
+			super(out, formatter);
+		}
+
+		@Override
+		public synchronized void publish(LogRecord record) {
+			super.publish(record);
+			flush();
+		}
+
 	}
 
 }
