@@ -8,7 +8,6 @@ import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.io.PrintStream;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -45,17 +44,24 @@ public class JTrainDccppStationGui {
 	 *             Never thrown.
 	 * @throws UnsupportedLookAndFeelException
 	 *             Never thrown.
+	 * @throws SecurityException
+	 *             Thrown if a security manager exists and if the caller does
+	 *             not have LoggingPermission("control").
+	 * @throws IOException
+	 *             Thrown if an I/O error occurs when opening the log output
+	 *             file.
 	 */
 	public static void main(String[] args)
 			throws ClassNotFoundException, InstantiationException, IllegalAccessException,
-			UnsupportedLookAndFeelException {
+			UnsupportedLookAndFeelException, SecurityException, IOException {
 		UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
 		new JTrainDccppStationGui();
 	}
 
 	private DccppStation station;
 
-	private JTrainDccppStationGui() {
+	private JTrainDccppStationGui() throws SecurityException, IOException {
+		final JTrainLogger logger = new JTrainLogger("DCC++ Station GUI", System.out);
 		final JFrame frame = new JFrame("DCC++ station");
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.setLayout(null);
@@ -78,12 +84,11 @@ public class JTrainDccppStationGui {
 				if (station == null) {
 					int controllerPort = (int) controllerPortSelector.getValue();
 					int accessoryPort = (int) accessoryPortSelector.getValue();
-					System.out.println(
-							"Starting station on controller port " + controllerPort
-									+ " and accessory port " + accessoryPort + "...");
+					logger.info("Starting station on controller port " + controllerPort
+							+ " and accessory port " + accessoryPort + "...");
 					try {
 						station = new DccppStation(controllerPort, accessoryPort);
-						System.out.println("Started");
+						logger.info("Started");
 					}
 					catch (IOException ex) {
 						ex.printStackTrace();
@@ -91,10 +96,10 @@ public class JTrainDccppStationGui {
 					startStopButton.setText("Stop");
 				}
 				else {
-					System.out.println("Stopping station...");
+					logger.info("Stopping station...");
 					try {
 						station.close();
-						System.out.println("Stopped");
+						logger.info("Stopped");
 					}
 					catch (IOException ex) {
 						ex.printStackTrace();
@@ -115,7 +120,7 @@ public class JTrainDccppStationGui {
 		logPane.setBorder(new TitledBorder(new EtchedBorder(), "Log"));
 		logPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 
-		PrintStream logStream = new PrintStream(new OutputStream() {
+		logger.addLoggerStream(new OutputStream() {
 			private final StringBuilder sb = new StringBuilder();
 
 			@Override
@@ -134,9 +139,7 @@ public class JTrainDccppStationGui {
 					sb.append((char) b);
 				}
 			}
-		}, true);
-		System.setOut(logStream);
-		System.setErr(logStream);
+		});
 
 		controllerPortLabel.setBounds(10, 10, 150, 25);
 		frame.add(controllerPortLabel);

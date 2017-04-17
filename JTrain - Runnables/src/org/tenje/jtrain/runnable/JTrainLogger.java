@@ -20,6 +20,7 @@ import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Date;
+import java.util.Objects;
 import java.util.logging.FileHandler;
 import java.util.logging.Handler;
 import java.util.logging.LogRecord;
@@ -48,13 +49,30 @@ public class JTrainLogger extends Logger {
 	 *             not have LoggingPermission("control").
 	 * @throws IOException
 	 *             Thrown if an I/O error occurs when opening the output file.
+	 * @throws NullPointerException
+	 *             Thrown if <code>logStreams</code> is <code>null</code> or any
+	 *             element in <code>logStreams</code> is <code>null</code>.
 	 */
 	public JTrainLogger(String name, OutputStream... logStreams)
 			throws SecurityException, IOException {
 		super(name, null);
+		Objects.requireNonNull(logStreams, "logStreams");
 		for (OutputStream out : logStreams) {
-			addHandler(new StreamHandler(out, FORMATTER));
+			addLoggerStream(out);
 		}
+	}
+
+	/**
+	 * Adds an {@link OutputStream} as output for this logger.
+	 * 
+	 * @param out
+	 *            The output stream to add.
+	 * @throws NullPointerException
+	 *             Thrown if <code>out</code> is <code>null</code>.
+	 */
+	public void addLoggerStream(OutputStream out) {
+		Objects.requireNonNull(out, "out");
+		addHandler(new StreamHandler(out, FORMATTER));
 	}
 
 	private static class Formatter extends java.util.logging.Formatter {
