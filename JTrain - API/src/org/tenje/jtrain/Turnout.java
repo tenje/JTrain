@@ -20,7 +20,7 @@ package org.tenje.jtrain;
  * 
  * @author Jonas Tennié
  */
-public interface Turnout extends AddressableSwitchable {
+public interface Turnout extends Addressable, Switchable {
 
 	@Override
 	AccessoryDecoderAddress getAddress();

@@ -23,10 +23,10 @@ import org.tenje.jtrain.AbstractOutputRegistry;
 import org.tenje.jtrain.AccessoryDecoderAddress;
 import org.tenje.jtrain.Address;
 import org.tenje.jtrain.AddressRegistry;
-import org.tenje.jtrain.AddressableSwitchable;
 import org.tenje.jtrain.OutputRegistry;
 import org.tenje.jtrain.SimpleAddressRegistry;
 import org.tenje.jtrain.Switchable;
+import org.tenje.jtrain.Turnout;
 import org.tenje.jtrain.dccpp.LocalPacketBroker;
 import org.tenje.jtrain.dccpp.Packet;
 import org.tenje.jtrain.dccpp.PacketBroker;
@@ -45,7 +45,7 @@ import org.tenje.jtrain.dccpp.PacketTurnoutThrow;
  * 
  * @author Jonas Tennié
  */
-public class PacketTurnoutRegistry extends AbstractOutputRegistry<AddressableSwitchable>
+public class PacketTurnoutRegistry extends AbstractOutputRegistry<Turnout>
 		implements PacketListeningRegistry {
 
 	private final AddressRegistry addressRegistry = new SimpleAddressRegistry();
@@ -82,7 +82,7 @@ public class PacketTurnoutRegistry extends AbstractOutputRegistry<AddressableSwi
 				Address address = getAddressRegistry()
 						.getAddress(((PacketTurnoutThrow) packet).getId());
 				if (address != null) {
-					Set<AddressableSwitchable> byId = getEntries().get(address);
+					Set<Turnout> byId = getEntries().get(address);
 					if (byId != null) {
 						for (Switchable switchable : byId) {
 							switchable.setSwitched(
