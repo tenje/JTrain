@@ -78,7 +78,7 @@ public class JTrainLogger extends Logger {
 	private static class Formatter extends java.util.logging.Formatter {
 
 		// Static as only one Formatter instance exists
-		private final String FORMAT = "[%1$tb %1$te %1$tY, %1$tH:%1$tM:%1$tS, %2$s]: %3$s %4$s\r\n";
+		private final String FORMAT = "[%1$tb %1$te %1$tY, %1$tH:%1$tM:%1$tS, %2$s]: %3$s %4$s%5$s";
 		private final Date DATE = new Date();
 
 		@Override
@@ -95,7 +95,7 @@ public class JTrainLogger extends Logger {
 				throwable = sw.toString();
 			}
 			return String.format(FORMAT, DATE, record.getLevel().getLocalizedName(),
-					message, throwable);
+					message, throwable, System.getProperty("line.separator"));
 		}
 
 	}

@@ -1,7 +1,6 @@
 package org.tenje.jtrain.runnable;
 
 import java.awt.Dimension;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ComponentAdapter;
@@ -114,8 +113,8 @@ public class JTrainDccppStationGui {
 		logArea.setEditable(false);
 		logArea.setLineWrap(true);
 		logArea.setWrapStyleWord(true);
-		logArea.setFont(new Font(logArea.getFont().getFontName(),
-				logArea.getFont().getStyle(), 18));
+		// logArea.setFont(new Font(logArea.getFont().getFontName(),
+		// logArea.getFont().getStyle(), 18));
 		final JScrollPane logPane = new JScrollPane(logArea);
 		logPane.setBorder(new TitledBorder(new EtchedBorder(), "Log"));
 		logPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);

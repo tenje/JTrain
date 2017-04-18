@@ -41,27 +41,18 @@ import org.tenje.jtrain.Signal;
 import org.tenje.jtrain.SignalAspect;
 import org.tenje.jtrain.SignalAspectControlTurnout;
 import org.tenje.jtrain.SwitchableScheduler;
-import org.tenje.jtrain.SwitchableSchedulerBuilder;
 import org.tenje.jtrain.Turnout;
 import org.tenje.jtrain.dccpp.PacketFactory;
 import org.tenje.jtrain.dccpp.impl.PacketFactoryImpl;
 import org.tenje.jtrain.dccpp.impl.PacketSensorRegistry;
 import org.tenje.jtrain.dccpp.impl.PacketTurnoutRegistry;
 import org.tenje.jtrain.dccpp.server.DccppSocket;
-import org.tenje.jtrain.rpi.RPiOutputPin;
 import org.tenje.jtrain.rpi.RPiSensor;
 import org.tenje.jtrain.rpi.RPiServoTurnout;
 import org.tenje.jtrain.rpi.RPiSignal;
 import org.tenje.jtrain.rpi.RPiTurnout;
 
-import com.pi4j.io.gpio.GpioController;
-import com.pi4j.io.gpio.GpioFactory;
-import com.pi4j.io.gpio.GpioPinDigitalInput;
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
-import com.pi4j.io.gpio.Pin;
-import com.pi4j.io.gpio.PinPullResistance;
-import com.pi4j.io.gpio.PinState;
-import com.pi4j.io.gpio.RaspiPin;
 
 /**
  * A stand-alone program to control some accessories.
@@ -145,7 +136,7 @@ public class JTrainAccessories {
 						throw new MissingFormatArgumentException(
 								"no address defined: " + accessoryElem);
 					}
-					pin = getOutputPin(aspectElem, "pin");
+					pin = JTrainXmlReader.getOutputPin(aspectElem, "pin");
 					if (pins.put(aspect, pin) != null) {
 						throw new IllegalArgumentException(
 								"color already defined: " + aspect.name().toLowerCase());
@@ -165,7 +156,8 @@ public class JTrainAccessories {
 				}
 			}
 			else if (accessoryElem.getName().equals("scheduler")) {
-				SwitchableScheduler scheduler = getScheduler(accessoryElem);
+				SwitchableScheduler scheduler = JTrainXmlReader
+						.getScheduler(accessoryElem);
 				if ((attribute = accessoryElem.getAttribute("address")) != null) {
 					accessoryAddress = new AccessoryDecoderAddress(
 							Integer.parseInt(attribute.getValue()), 0);
@@ -180,7 +172,7 @@ public class JTrainAccessories {
 					switch (accessoryElem.getName()) {
 						case "sensor": {
 							Sensor sensor = new RPiSensor(accessoryAddress,
-									getInputPin(accessoryElem, "pin"));
+									JTrainXmlReader.getInputPin(accessoryElem, "pin"));
 							sensors.add(sensor);
 						}
 						break;
@@ -191,8 +183,11 @@ public class JTrainAccessories {
 								switchTime = Integer.parseInt(attribute.getValue());
 							}
 							Turnout turnout = new RPiTurnout(accessoryAddress,
-									getOutputPin(accessoryElem, "straightPin"),
-									getOutputPin(accessoryElem, "thrownPin"), switchTime);
+									JTrainXmlReader.getOutputPin(accessoryElem,
+											"straightPin"),
+									JTrainXmlReader.getOutputPin(accessoryElem,
+											"thrownPin"),
+									switchTime);
 							turnoutRegistry.register(turnout);
 						}
 						break;
@@ -270,98 +265,6 @@ public class JTrainAccessories {
 			}
 			logger.log(Level.WARNING, "Connection lost. Trying to reconnect...");
 		}
-	}
-
-	private static GpioPinDigitalInput getInputPin(Element elem, String name) {
-		GpioController gpio = GpioFactory.getInstance();
-		Attribute attribute;
-		if ((attribute = elem.getAttribute(name)) != null) {
-			Pin pin = RaspiPin.getPinByAddress(Integer.parseInt(attribute.getValue()));
-			if (pin != null) {
-				return gpio.provisionDigitalInputPin(pin, PinPullResistance.PULL_UP);
-			}
-			else {
-				throw new IllegalArgumentException(
-						"pin does not exist: " + attribute.getValue());
-			}
-		}
-		else {
-			throw new MissingFormatArgumentException(
-					"pin attribute missing for " + elem + ": " + name);
-		}
-	}
-
-	private static GpioPinDigitalOutput getOutputPin(Element elem, String name) {
-		GpioController gpio = GpioFactory.getInstance();
-		Attribute attribute;
-		if ((attribute = elem.getAttribute(name)) != null) {
-			Pin pin = RaspiPin.getPinByAddress(Integer.parseInt(attribute.getValue()));
-			if (pin != null) {
-				return gpio.provisionDigitalOutputPin(pin, PinState.LOW);
-			}
-			else {
-				throw new IllegalArgumentException(
-						"pin does not exist: " + attribute.getValue());
-			}
-		}
-		else {
-			throw new MissingFormatArgumentException(
-					"pin attribute missing for " + elem + ": " + name);
-		}
-	}
-
-	private static SwitchableScheduler getScheduler(Element elem) {
-		SwitchableSchedulerBuilder builder = new SwitchableSchedulerBuilder();
-		Attribute attribute;
-		boolean loop = true;
-		if ((attribute = elem.getAttribute("loop")) != null) {
-			String attributeValue = attribute.getValue().toLowerCase();
-			if (attributeValue.equals("false")) {
-				loop = false;
-			}
-			else if (!attributeValue.equals("true")) {
-				throw new IllegalArgumentException(
-						"state argument: " + attribute.getValue());
-			}
-		}
-		for (Element child : elem.getChildren()) {
-			switch (child.getName()) {
-				case "pinState": {
-					GpioPinDigitalOutput pin = getOutputPin(child, "pin");
-					boolean state;
-					attribute = child.getAttribute("state");
-					if (attribute == null) {
-						throw new MissingFormatArgumentException(
-								"no state defined: " + child);
-					}
-					String attributeValue = attribute.getValue().toLowerCase();
-					if (attributeValue.equals("high")) {
-						state = true;
-					}
-					else if (attributeValue.equals("low")) {
-						state = false;
-					}
-					else {
-						throw new IllegalArgumentException(
-								"state argument: " + attribute.getValue());
-					}
-					builder.setState(new RPiOutputPin(pin), state);
-				}
-				break;
-				case "sleep": {
-					if ((attribute = elem.getAttribute("time")) != null) {
-						long time = Long.parseLong(attribute.getValue());
-						builder.sleep(time);
-					}
-					else {
-						throw new MissingFormatArgumentException(
-								"no thrownPwm defined: " + child);
-					}
-				}
-				break;
-			}
-		}
-		return builder.build(loop);
 	}
 
 }
