@@ -51,6 +51,7 @@ import org.tenje.jtrain.rpi.RPiSensor;
 import org.tenje.jtrain.rpi.RPiServoTurnout;
 import org.tenje.jtrain.rpi.RPiSignal;
 import org.tenje.jtrain.rpi.RPiTurnout;
+import org.tenje.jtrain.runnable.JTrainXmlReader.XmlReadException;
 
 import com.pi4j.io.gpio.GpioPinDigitalOutput;
 
@@ -78,6 +79,10 @@ public class JTrainAccessories {
 				new FileOutputStream("accessories.log.txt"));
 		try {
 			start(args, logger);
+		}
+		catch (XmlReadException ex) {
+			logger.log(Level.SEVERE, "Failed to start program, invalid configuration:"
+					+ System.getProperty("line.separator") + "\t" + ex.getMessage());
 		}
 		catch (Throwable t) {
 			logger.log(Level.SEVERE, "Failed to start program:", t);

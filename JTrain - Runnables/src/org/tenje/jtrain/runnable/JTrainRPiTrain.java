@@ -23,7 +23,6 @@ import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.MissingFormatArgumentException;
 import java.util.Set;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -54,6 +53,7 @@ import org.tenje.jtrain.dccpp.server.DccppSocket;
 import org.tenje.jtrain.rpi.RPiPinTrainFunction;
 import org.tenje.jtrain.rpi.RPiPinTrainFunctionDirectionDepend;
 import org.tenje.jtrain.rpi.RPiTrain;
+import org.tenje.jtrain.runnable.JTrainXmlReader.XmlReadException;
 
 import com.pi4j.io.gpio.GpioController;
 import com.pi4j.io.gpio.GpioFactory;
@@ -89,6 +89,10 @@ public class JTrainRPiTrain {
 				new FileOutputStream("train.log.txt"));
 		try {
 			start(args, logger);
+		}
+		catch (XmlReadException ex) {
+			logger.log(Level.SEVERE, "Failed to start program, invalid configuration:"
+					+ System.getProperty("line.separator") + "\t" + ex.getMessage());
 		}
 		catch (Throwable t) {
 			logger.log(Level.SEVERE, "Failed to start program:", t);
@@ -141,55 +145,31 @@ public class JTrainRPiTrain {
 		SAXBuilder builder = new SAXBuilder();
 		Document document = builder.build(new FileInputStream("train.xml"));
 		Element root = document.getRootElement();
-		Attribute attribute;
 		int id, addressValue, forwardPin, reversePin, acceleration = DEFAULT_ACCELERATION,
 				minPower = DEFAULT_MIN_POWER, maxPower = DEFAULT_MAX_POWER;
 		TrainFunction function = null;
 		RPiTrain train;
 
-		// Check and parse required attributes
-		if ((attribute = root.getAttribute("address")) == null) {
-			throw new MissingFormatArgumentException("train address missing");
-		}
-		else {
-			addressValue = Integer.parseInt(attribute.getValue());
-		}
-		if ((attribute = root.getAttribute("forwardPin")) == null) {
-			throw new MissingFormatArgumentException("train forwardPin missing");
-		}
-		else {
-			forwardPin = Integer.parseInt(attribute.getValue());
-		}
-		if ((attribute = root.getAttribute("reversePin")) == null) {
-			throw new MissingFormatArgumentException("train reversePin missing");
-		}
-		else {
-			reversePin = Integer.parseInt(attribute.getValue());
-		}
+		addressValue = JTrainXmlReader.getInt(root, "address");
+		forwardPin = JTrainXmlReader.getInt(root, "forwardPin");
+		reversePin = JTrainXmlReader.getInt(root, "reversePin");
 
 		// Parse optional attributes
-		if ((attribute = root.getAttribute("acceleration")) != null) {
-			acceleration = Integer.parseInt(attribute.getValue());
+		if (root.getAttribute("acceleration") != null) {
+			acceleration = JTrainXmlReader.getInt(root, "acceleration");
 		}
-		if ((attribute = root.getAttribute("minPower")) != null) {
-			minPower = Integer.parseInt(attribute.getValue());
+		if (root.getAttribute("minPower") != null) {
+			acceleration = JTrainXmlReader.getInt(root, "minPower");
 		}
-		if ((attribute = root.getAttribute("maxPower")) != null) {
-			maxPower = Integer.parseInt(attribute.getValue());
+		if (root.getAttribute("maxPower") != null) {
+			acceleration = JTrainXmlReader.getInt(root, "maxPower");
 		}
 
 		// Create train
 		train = new RPiTrain(new LongTrainAddress(addressValue), forwardPin, reversePin,
 				acceleration, minPower, maxPower);
-
 		for (Element functionElem : root.getChild("functions").getChildren()) {
-			if ((attribute = functionElem.getAttribute("id")) != null) {
-				id = Integer.parseInt(attribute.getValue());
-			}
-			else {
-				throw new MissingFormatArgumentException(
-						"function id missing: " + functionElem);
-			}
+			id = JTrainXmlReader.getInt(functionElem, "id");
 			switch (functionElem.getName()) {
 				case "gpioFunction": {
 					function = getPinFunction(functionElem, train);
@@ -234,42 +214,32 @@ public class JTrainRPiTrain {
 	}
 
 	private static TrainFunction getPinFunction(Element functionElem, RPiTrain train) {
-		Attribute attribute;
 		GpioController gpio = GpioFactory.getInstance();
-		GpioPinDigitalOutput pin;
-		if ((attribute = functionElem.getAttribute("pin")) != null) {
-			pin = gpio.provisionDigitalOutputPin(
-					RaspiPin.getPinByAddress(Integer.parseInt(attribute.getValue())));
-			if (pin != null) {
-				return new RPiPinTrainFunction(pin);
-			}
-			else {
-				throw new IllegalArgumentException(
-						"pin does not exist: " + attribute.getValue());
-			}
+		if (functionElem.getAttribute("pin") != null) {
+			return new RPiPinTrainFunction(
+					JTrainXmlReader.getOutputPin(functionElem, "pin"));
 		}
 		else {
 			int forwardPin = -1;
 			int reversePin = -1;
-			if ((attribute = functionElem.getAttribute("forwardPin")) != null) {
-				forwardPin = Integer.parseInt(attribute.getValue());
+			if (functionElem.getAttribute("forwardPin") != null) {
+				forwardPin = JTrainXmlReader.getInt(functionElem, "forwardPin");
 			}
-			if ((attribute = functionElem.getAttribute("reversePin")) != null) {
-				reversePin = Integer.parseInt(attribute.getValue());
+			if (functionElem.getAttribute("reversePin") != null) {
+				reversePin = JTrainXmlReader.getInt(functionElem, "reversePin");
 			}
 			if (forwardPin == -1 && reversePin == -1) {
-				throw new MissingFormatArgumentException(
-						"no pin defined in gpioFunction");
+				throw new XmlReadException("no pin defined in gpioFunction");
 			}
 			GpioPinDigitalOutput forward = gpio
 					.provisionDigitalOutputPin(RaspiPin.getPinByAddress(forwardPin));
 			if (forward == null) {
-				throw new IllegalArgumentException("pin does not exist: " + forwardPin);
+				throw new XmlReadException("pin does not exist: " + forwardPin);
 			}
 			GpioPinDigitalOutput reverse = gpio
 					.provisionDigitalOutputPin(RaspiPin.getPinByAddress(reversePin));
 			if (reverse == null) {
-				throw new IllegalArgumentException("pin does not exist: " + reversePin);
+				throw new XmlReadException("pin does not exist: " + reversePin);
 			}
 			return new RPiPinTrainFunctionDirectionDepend(forward, reverse, train);
 		}
@@ -320,8 +290,7 @@ public class JTrainRPiTrain {
 					AudioSystem.getAudioInputStream(new File(child.getTextNormalize())));
 		}
 		else {
-			throw new MissingFormatArgumentException(
-					"no loop sound defined: " + functionElem);
+			throw new XmlReadException("no loop sound defined: " + functionElem);
 		}
 		if ((child = functionElem.getChild("enableSound")) != null) {
 			Line.Info linfo = new Line.Info(Clip.class);

@@ -216,7 +216,7 @@ class JTrainXmlReader {
 		return new PermanentSoundTrainFunction(enableClip, loopClip, disableClip);
 	}
 
-	private static int getInt(Element elem, String name) {
+	static int getInt(Element elem, String name) {
 		Attribute attribute = elem.getAttribute(name);
 		if (attribute != null) {
 			try {
@@ -230,7 +230,7 @@ class JTrainXmlReader {
 		throw new XmlReadException(name + " attribute missing for " + elem);
 	}
 
-	private static long getLong(Element elem, String name) {
+	static long getLong(Element elem, String name) {
 		Attribute attribute = elem.getAttribute(name);
 		if (attribute != null) {
 			try {
